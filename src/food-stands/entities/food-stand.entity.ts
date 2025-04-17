@@ -21,7 +21,10 @@ export class FoodStand {
     })
     location: string;
 
-    @Column('float')
+    @Column({
+        type: 'float',
+        nullable: false
+    })
     latitude: number;
 
     @Column({

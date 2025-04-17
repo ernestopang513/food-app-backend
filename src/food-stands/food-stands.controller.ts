@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseUUIDPipe } from '@nestjs/common';
 import { FoodStandsService } from './food-stands.service';
 import { CreateFoodStandDto } from './dto/create-food-stand.dto';
 import { UpdateFoodStandDto } from './dto/update-food-stand.dto';
@@ -19,16 +19,19 @@ export class FoodStandsController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.foodStandsService.findOne(+id);
+    return this.foodStandsService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateFoodStandDto: UpdateFoodStandDto) {
-    return this.foodStandsService.update(+id, updateFoodStandDto);
+  update(
+    @Param('id', ParseUUIDPipe) id: string, 
+    @Body() updateFoodStandDto: UpdateFoodStandDto
+  ) {
+    return this.foodStandsService.update(id, updateFoodStandDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.foodStandsService.remove(+id);
+    return this.foodStandsService.remove(id);
   }
 }

@@ -1,4 +1,4 @@
-import { IsBoolean, IsLatitude, IsLongitude, IsString, MinLength } from "class-validator";
+import { IsBoolean, IsLatitude, IsLongitude, IsOptional, IsString, MinLength } from "class-validator";
 
 
 export class CreateFoodStandDto {
@@ -17,4 +17,7 @@ export class CreateFoodStandDto {
     @IsLongitude()
     longitude: number;
 
+    @IsBoolean()
+    @IsOptional()
+    is_open?: boolean;
 }

@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { FoodStandDish } from "src/food-stand-dish/entities/food-stand-dish.entity";
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 
 
@@ -46,4 +47,10 @@ export class FoodStand {
     })
     created_at: Date;
 
+    @OneToMany(
+        () => FoodStandDish,
+        (foodStandDish) => foodStandDish.foodStand,
+        {cascade: true, eager: true}
+    )
+    foodStandDishes: FoodStandDish;
 }

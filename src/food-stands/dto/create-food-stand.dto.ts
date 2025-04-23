@@ -1,4 +1,5 @@
-import { IsBoolean, IsLatitude, IsLongitude, IsOptional, IsString, MinLength } from "class-validator";
+import { IsArray, IsBoolean, IsLatitude, IsLongitude, IsOptional, IsString, MinLength } from "class-validator";
+import { FoodStandDish } from "src/food-stand-dish/entities/food-stand-dish.entity";
 
 
 export class CreateFoodStandDto {
@@ -20,4 +21,13 @@ export class CreateFoodStandDto {
     @IsBoolean()
     @IsOptional()
     is_open?: boolean;
+
+    @IsOptional()
+    @IsArray()
+    foodStandDishes?: FoodStandDish[];
+
+    
+
+
+
 }

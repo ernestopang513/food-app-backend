@@ -52,5 +52,5 @@ export class FoodStand {
         (foodStandDish) => foodStandDish.foodStand,
         {cascade: true, eager: true}
     )
-    foodStandDishes: FoodStandDish;
+    foodStandDishes?: FoodStandDish[];
 }

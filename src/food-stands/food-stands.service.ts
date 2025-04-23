@@ -6,6 +6,7 @@ import { Repository } from 'typeorm';
 import { FoodStand } from './entities/food-stand.entity';
 
 import {validate as isUUID} from 'uuid';
+import { FoodStandDish } from 'src/food-stand-dish/entities/food-stand-dish.entity';
 
 @Injectable()
 export class FoodStandsService {
@@ -15,7 +16,10 @@ export class FoodStandsService {
   constructor (
 
     @InjectRepository(FoodStand)
-    private readonly foodStandRepository: Repository<FoodStand>
+    private readonly foodStandRepository: Repository<FoodStand>,
+
+    @InjectRepository(FoodStandDish)
+    private readonly foodStandDishRepository: Repository<FoodStandDish>
 
 
   ) {}
@@ -23,7 +27,13 @@ export class FoodStandsService {
   async create(createFoodStandDto: CreateFoodStandDto) {
 
     try {
-      const foodStand = this.foodStandRepository.create(createFoodStandDto);
+      // const { foodStandDishes = [], ...foodStandDetails } = createFoodStandDto;
+
+      // const foodStand = this.foodStandRepository.create({
+      //   ...foodStandDetails,
+      //   foodStandDishes: []
+      // });
+      const foodStand = this.foodStandRepository.create( createFoodStandDto );
       await this.foodStandRepository.save(foodStand);
 
       return foodStand

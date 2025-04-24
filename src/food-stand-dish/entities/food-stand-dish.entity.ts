@@ -1,3 +1,4 @@
+import { Dish } from "src/dish/entities/dish.entity";
 import { FoodStand } from "src/food-stands/entities/food-stand.entity";
 import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
@@ -26,4 +27,11 @@ export class FoodStandDish {
         {onDelete: 'CASCADE'}
     )
     foodStand: FoodStand;
+
+    @ManyToOne(
+        () => Dish,
+        (dish) => dish.foodStandDishes,
+        {onDelete: 'CASCADE'}
+    )
+    dish: Dish
 }

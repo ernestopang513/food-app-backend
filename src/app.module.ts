@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { FoodStandsModule } from './food-stands/food-stands.module';
 import { FoodStandDishModule } from './food-stand-dish/food-stand-dish.module';
+import { DishModule } from './dish/dish.module';
 
 
 @Module({
@@ -24,7 +25,9 @@ import { FoodStandDishModule } from './food-stand-dish/food-stand-dish.module';
 
     FoodStandsModule,
 
-    FoodStandDishModule
+    FoodStandDishModule,
+
+    DishModule
   ],
 })
 export class AppModule {}

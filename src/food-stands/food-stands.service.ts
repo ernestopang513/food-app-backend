@@ -45,7 +45,9 @@ export class FoodStandsService {
   }
 
   findAll() {
-    return this.foodStandRepository.find({})
+    return this.foodStandRepository.find({
+      relations: ['foodStandDishes', 'foodStandDishes.dish']
+    })
   }
 
   async findOne(id: string) {

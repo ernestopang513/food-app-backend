@@ -1,10 +1,11 @@
 import { Dish } from "src/dish/entities/dish.entity";
 import { FoodStand } from "src/food-stands/entities/food-stand.entity";
-import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, Unique } from "typeorm";
 
 
 
 @Entity()
+@Unique(['foodStand', 'dish'])
 export class FoodStandDish {
 
     @PrimaryGeneratedColumn('uuid')

@@ -4,6 +4,7 @@ import { FoodStandDishController } from './food-stand-dish.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { FoodStandDish } from './entities/food-stand-dish.entity';
 import { FoodStand } from 'src/food-stands/entities/food-stand.entity';
+import { Dish } from 'src/dish/entities/dish.entity';
 
 @Module({
   controllers: [FoodStandDishController],
@@ -11,7 +12,8 @@ import { FoodStand } from 'src/food-stands/entities/food-stand.entity';
   imports: [
     TypeOrmModule.forFeature([
       FoodStandDish,
-      FoodStand
+      FoodStand,
+      Dish
     ])
   ]
 })

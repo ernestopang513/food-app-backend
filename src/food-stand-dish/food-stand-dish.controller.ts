@@ -7,14 +7,15 @@ import { UpdateFoodStandDishDto } from './dto/update-food-stand-dish.dto';
 export class FoodStandDishController {
   constructor(private readonly foodStandDishService: FoodStandDishService) {}
 
-  @Post(':foodStandId')
+  @Post(':foodStandId/:dishId')
   create(
   
     @Param('foodStandId') foodStandId: string,
+    @Param('dishId') dishId: string,
     @Body() createFoodStandDishDto: CreateFoodStandDishDto
   
   ) {
-    return this.foodStandDishService.create(foodStandId, createFoodStandDishDto);
+    return this.foodStandDishService.create(foodStandId, dishId ,  createFoodStandDishDto);
   }
 
   // @Get()

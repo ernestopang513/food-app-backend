@@ -5,6 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { FoodStandDish } from './entities/food-stand-dish.entity';
 import { Repository } from 'typeorm';
 import { FoodStand } from 'src/food-stands/entities/food-stand.entity';
+import { Dish } from 'src/dish/entities/dish.entity';
 
 @Injectable()
 export class FoodStandDishService {
@@ -16,13 +17,16 @@ export class FoodStandDishService {
     private readonly foodStandDishRepository: Repository<FoodStandDish>,
 
     @InjectRepository(FoodStand)
-    private readonly foodStandRepository: Repository<FoodStand>
+    private readonly foodStandRepository: Repository<FoodStand>,
+
+    @InjectRepository(Dish)
+    private readonly dishRepository: Repository<Dish>
 
   ) {}
 
 
 
-  async create( foodStandId: string ,createFoodStandDishDto: CreateFoodStandDishDto) {
+  async create( foodStandId: string, dishId: string ,createFoodStandDishDto: CreateFoodStandDishDto) {
 
     const foodStand = await this.foodStandRepository.findOne({
       where: {id: foodStandId},
@@ -31,9 +35,17 @@ export class FoodStandDishService {
     if (!foodStand)
       throw new NotFoundException(`Food Stand with id ${foodStandId} not found.`);
 
+    const dish = await this.dishRepository.findOne({
+      where: {id: dishId},
+    });
+
+    if (!dish)
+      throw new NotFoundException(`Dish with id ${dishId} not found.`);
+
     const foodStandDish = this.foodStandDishRepository.create({
       ...createFoodStandDishDto,
       foodStand,
+      dish
     })
 
 

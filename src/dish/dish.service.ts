@@ -4,6 +4,7 @@ import { UpdateDishDto } from './dto/update-dish.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Dish } from './entities/dish.entity';
 import { Repository } from 'typeorm';
+import { FoodStandDish } from 'src/food-stand-dish/entities/food-stand-dish.entity';
 
 @Injectable()
 export class DishService {
@@ -12,7 +13,10 @@ export class DishService {
   constructor(
     
     @InjectRepository(Dish)
-    private readonly dishRepository: Repository<Dish>
+    private readonly dishRepository: Repository<Dish>,
+
+    @InjectRepository(FoodStandDish)
+    private readonly foodStandDish: Repository<FoodStandDish>
 
   ){}
 

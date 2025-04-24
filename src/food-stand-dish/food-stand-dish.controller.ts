@@ -17,23 +17,23 @@ export class FoodStandDishController {
     return this.foodStandDishService.create(foodStandId, createFoodStandDishDto);
   }
 
-  @Get()
-  findAll() {
-    return this.foodStandDishService.findAll();
-  }
+  // @Get()
+  // findAll() {
+  //   return this.foodStandDishService.findAll();
+  // }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.foodStandDishService.findOne(+id);
+    return this.foodStandDishService.findOne(id);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateFoodStandDishDto: UpdateFoodStandDishDto) {
-    return this.foodStandDishService.update(+id, updateFoodStandDishDto);
+    return this.foodStandDishService.update(id, updateFoodStandDishDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.foodStandDishService.remove(+id);
+    return this.foodStandDishService.remove(id);
   }
 }

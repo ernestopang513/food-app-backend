@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
 import { CreateDishDto } from './dto/create-dish.dto';
 import { UpdateDishDto } from './dto/update-dish.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -15,8 +15,8 @@ export class DishService {
     @InjectRepository(Dish)
     private readonly dishRepository: Repository<Dish>,
 
-    @InjectRepository(FoodStandDish)
-    private readonly foodStandDish: Repository<FoodStandDish>
+    // @InjectRepository(FoodStandDish)
+    // private readonly foodStandDishRepository: Repository<FoodStandDish>
 
   ){}
 
@@ -32,19 +32,48 @@ export class DishService {
   }
 
   findAll() {
-    return `This action returns all dish`;
+    return this.dishRepository.find({})
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} dish`;
+  async findOne(id: string) {
+
+    try {
+
+      const dish = await this.dishRepository.findOneBy({id});
+      if(!dish) throw new NotFoundException(`Dish with id ${id} not found`);
+
+      return dish;
+      
+    } catch (error) {
+      this.handleDBExceptions(error);
+    }
+
   }
 
-  update(id: number, updateDishDto: UpdateDishDto) {
-    return `This action updates a #${id} dish`;
+  async update(id: string, updateDishDto: UpdateDishDto) {
+
+    const dish = await this.dishRepository.preload({
+      id: id,
+      ...updateDishDto
+    })
+
+    if (!dish) throw new NotFoundException(`Dish with id: ${id} not found`);
+
+    try {
+      await this.dishRepository.save(dish);
+      return dish
+    } catch (error) {
+      this.logger.error(`Error updating food stand dish with id: ${id}`, error.stack);
+      this.handleDBExceptions(error);
+    }
+
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} dish`;
+  async remove(id: string) {
+
+    const dish = await this.findOne(id)
+    await this.dishRepository.remove(dish)
+
   }
 
   private handleDBExceptions(error: any): never {

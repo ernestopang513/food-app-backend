@@ -50,7 +50,9 @@ export class FoodStand {
     @OneToMany(
         () => FoodStandDish,
         (foodStandDish) => foodStandDish.foodStand,
-        {cascade: true, eager: true}
+        {cascade: true},
+        //* No tiene sentido usar eager porque ya hago relations para extraer los datos en el metodo find
+        // {cascade: true, eager: true}
     )
     foodStandDishes?: FoodStandDish[];
 }

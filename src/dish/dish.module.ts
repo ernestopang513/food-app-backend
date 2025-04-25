@@ -10,8 +10,7 @@ import { FoodStandDish } from 'src/food-stand-dish/entities/food-stand-dish.enti
   providers: [DishService],
   imports: [
     TypeOrmModule.forFeature([
-      Dish,
-      FoodStandDish
+      Dish
     ])
   ]
 })

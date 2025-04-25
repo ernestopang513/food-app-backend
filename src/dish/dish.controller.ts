@@ -19,16 +19,16 @@ export class DishController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.dishService.findOne(+id);
+    return this.dishService.findOne(id);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateDishDto: UpdateDishDto) {
-    return this.dishService.update(+id, updateDishDto);
+    return this.dishService.update(id, updateDishDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.dishService.remove(+id);
+    return this.dishService.remove(id);
   }
 }

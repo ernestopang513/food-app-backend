@@ -18,8 +18,8 @@ export class FoodStandsService {
     @InjectRepository(FoodStand)
     private readonly foodStandRepository: Repository<FoodStand>,
 
-    @InjectRepository(FoodStandDish)
-    private readonly foodStandDishRepository: Repository<FoodStandDish>
+    // @InjectRepository(FoodStandDish)
+    // private readonly foodStandDishRepository: Repository<FoodStandDish>
 
 
   ) {}
@@ -109,6 +109,17 @@ export class FoodStandsService {
 
   }
 
+  async deleteAllFoodStands () {
+    const query = this.foodStandRepository.createQueryBuilder('foodStand');
 
+    try {
+      return await query
+        .delete()
+        .where({})
+        .execute();
+    } catch (error) {
+      this.handleDBExceptions(error)
+    }
+  }
 
 }

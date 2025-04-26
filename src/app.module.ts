@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { FoodStandsModule } from './food-stands/food-stands.module';
 import { FoodStandDishModule } from './food-stand-dish/food-stand-dish.module';
 import { DishModule } from './dish/dish.module';
+import { DeliveryPointModule } from './delivery-point/delivery-point.module';
 
 
 @Module({
@@ -27,7 +28,9 @@ import { DishModule } from './dish/dish.module';
 
     FoodStandDishModule,
 
-    DishModule
+    DishModule,
+
+    DeliveryPointModule
   ],
 })
 export class AppModule {}

@@ -13,6 +13,10 @@ import { FoodStandDish } from 'src/food-stand-dish/entities/food-stand-dish.enti
       FoodStand,
       FoodStandDish,
     ])
+  ],
+  exports: [
+    FoodStandsService,
+    TypeOrmModule
   ]
 })
 export class FoodStandsModule {}

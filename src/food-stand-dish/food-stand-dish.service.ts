@@ -96,6 +96,20 @@ export class FoodStandDishService {
     return `This action removes a #${id} foodStandDish`;
   }
 
+  async deleteAllFoodStandDish () {
+    const query = this.foodStandDishRepository.createQueryBuilder('foodStand');
+
+    try {
+      return await query
+        .delete()
+        .where({})
+        .execute();
+    } catch (error) {
+      this.handleDBExceptions(error)
+    }
+  }
+
+
   private handleDBExceptions(error: any): never {
       if (error.code === '23505')
         throw new BadRequestException(error.detail);

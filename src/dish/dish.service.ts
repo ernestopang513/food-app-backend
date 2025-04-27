@@ -76,6 +76,20 @@ export class DishService {
 
   }
 
+  async deleteAllDishes () {
+    const query = this.dishRepository.createQueryBuilder('dish');
+
+    try {
+      return await query
+        .delete()
+        .where({})
+        .execute();
+    } catch (error) {
+      this.handleDBExceptions(error)
+    }
+  }
+
+
   private handleDBExceptions(error: any): never {
       if (error.code === '23505')
         throw new BadRequestException(error.detail);

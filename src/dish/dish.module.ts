@@ -12,6 +12,9 @@ import { FoodStandDish } from 'src/food-stand-dish/entities/food-stand-dish.enti
     TypeOrmModule.forFeature([
       Dish
     ])
+  ],
+  exports: [
+    DishService,
   ]
 })
 export class DishModule {}

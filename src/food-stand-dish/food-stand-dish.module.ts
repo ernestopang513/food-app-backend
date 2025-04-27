@@ -15,6 +15,9 @@ import { Dish } from 'src/dish/entities/dish.entity';
       FoodStand,
       Dish
     ])
+  ],
+  exports: [
+    FoodStandDishService
   ]
 })
 export class FoodStandDishModule {}

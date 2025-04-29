@@ -6,6 +6,7 @@ import { FoodStandDishModule } from './food-stand-dish/food-stand-dish.module';
 import { DishModule } from './dish/dish.module';
 import { DeliveryPointModule } from './delivery-point/delivery-point.module';
 import { SeedModule } from './seed/seed.module';
+import { AuthModule } from './auth/auth.module';
 
 
 @Module({
@@ -33,7 +34,9 @@ import { SeedModule } from './seed/seed.module';
 
     DeliveryPointModule,
 
-    SeedModule
+    SeedModule,
+
+    AuthModule
   ],
 })
 export class AppModule {}

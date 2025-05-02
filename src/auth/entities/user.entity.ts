@@ -1,5 +1,5 @@
 import { Exclude } from "class-transformer";
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { BeforeInsert, BeforeUpdate, Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
 
 
@@ -39,6 +39,14 @@ export class User {
     role: string;
 
 
+    @BeforeInsert()
+    checkFieldsBeforeInsert() {
+        this.email = this.email.toLowerCase().trim();
+    }
 
+    @BeforeUpdate()
+    checkFieldBeforeUpdate() {
+        this.checkFieldsBeforeInsert();
+    }
 
 }

@@ -39,13 +39,13 @@ export class FoodStand {
         type: "bool",
         default: false
     })
-    is_open: boolean;
+    isOpen: boolean;
 
     @Column({
         type: 'timestamp',
         default: () => 'CURRENT_TIMESTAMP'
     })
-    created_at: Date;
+    createdAt: Date;
 
     @OneToMany(
         () => FoodStandDish,

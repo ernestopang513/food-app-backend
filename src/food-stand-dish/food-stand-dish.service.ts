@@ -25,7 +25,6 @@ export class FoodStandDishService {
   ) {}
 
 
-
   async create( foodStandId: string, dishId: string ,createFoodStandDishDto: CreateFoodStandDishDto) {
 
     const foodStand = await this.foodStandRepository.findOne({
@@ -47,9 +46,6 @@ export class FoodStandDishService {
       foodStand,
       dish
     })
-
-
-
     return this.foodStandDishRepository.save(foodStandDish);
   }
 
@@ -67,9 +63,6 @@ export class FoodStandDishService {
     } catch (error) {
       this.handleDBExceptions(error)
     }
-    
-
-    
   }
 
   async update(id: string, updateFoodStandDishDto: UpdateFoodStandDishDto) {
@@ -115,6 +108,5 @@ export class FoodStandDishService {
         throw new BadRequestException(error.detail);
       this.logger.error(error);
       throw new InternalServerErrorException('Unexpected error, check server logs');
-  
     }
 }

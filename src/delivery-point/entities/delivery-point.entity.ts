@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Order } from "src/order/entities/order.entity";
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 
 @Entity()
@@ -30,4 +31,11 @@ export class DeliveryPoint {
         default: true,
     })
     is_active: boolean;
+
+    @OneToMany(
+        () => Order,
+        (order) => order.deliveryPoint,
+        {onDelete: 'CASCADE'}
+    )
+    order: Order[]
 }

@@ -1,4 +1,5 @@
 import { FoodStandDish } from "src/food-stand-dish/entities/food-stand-dish.entity";
+import { OrderDish } from "src/order/entities/order-dish.entity";
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 
@@ -30,4 +31,14 @@ export class Dish {
         {cascade: true}
     )
     foodStandDishes: FoodStandDish[];
+    
+    
+    @OneToMany(
+        () => OrderDish,
+        (orderDish) => orderDish.dish,
+        {cascade: true}
+    )
+    orderDishes: OrderDish[];
+
+
 }

@@ -7,6 +7,7 @@ import { DishModule } from './dish/dish.module';
 import { DeliveryPointModule } from './delivery-point/delivery-point.module';
 import { SeedModule } from './seed/seed.module';
 import { AuthModule } from './auth/auth.module';
+import { OrderModule } from './order/order.module';
 
 
 @Module({
@@ -36,7 +37,9 @@ import { AuthModule } from './auth/auth.module';
 
     SeedModule,
 
-    AuthModule
+    AuthModule,
+
+    OrderModule
   ],
 })
 export class AppModule {}

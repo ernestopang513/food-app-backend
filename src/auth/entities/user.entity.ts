@@ -1,6 +1,7 @@
 import { Exclude } from "class-transformer";
 import { Order } from "src/order/entities/order.entity";
 import { BeforeInsert, BeforeUpdate, Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { UserRole } from "../enums/user-role.enum";
 
 
 
@@ -34,8 +35,11 @@ export class User {
     })
     isActive: boolean;
 
-    @Column('text', {
-        default: 'user'
+    @Column({
+        type: 'enum',
+        enum: UserRole,
+        nullable: false,
+        default: UserRole.USER
     })
     role: string;
 

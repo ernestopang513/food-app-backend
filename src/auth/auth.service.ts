@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException, Logger, UnauthorizedException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
@@ -10,9 +10,12 @@ import { instanceToPlain } from 'class-transformer';
 import { LoginUserDto } from './dto';
 import { JwtService } from '@nestjs/jwt';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
+import { UserRole } from './enums/user-role.enum';
 
 @Injectable()
 export class AuthService {
+
+  private readonly logger = new Logger('UserService')
 
   constructor(
 
@@ -37,6 +40,54 @@ export class AuthService {
       const savedUser = await this.userRepository.save(user);
 
 
+
+      return {
+        ...instanceToPlain(savedUser),
+        token: this.getJwtToken({id: user.id})
+      };
+    } catch (error) { 
+        this.handleDBErrors(error);
+    }
+
+  }
+  
+  async createAdmin( createUserDto: CreateUserDto) {
+
+    try {
+
+      const { password, ...userData} = createUserDto;
+      
+      const user = this.userRepository.create({
+        ...userData,
+        role: UserRole.ADMIN,
+        password: bcrypt.hashSync(password, 10 )
+      });
+
+      const savedUser = await this.userRepository.save(user);
+
+      return {
+        ...instanceToPlain(savedUser),
+        token: this.getJwtToken({id: user.id})
+      };
+    } catch (error) { 
+        this.handleDBErrors(error);
+    }
+
+  }
+  
+  async createEmployee( createUserDto: CreateUserDto) {
+
+    try {
+
+      const { password, ...userData} = createUserDto;
+      
+      const user = this.userRepository.create({
+        ...userData,
+        role: UserRole.EMPLOYEE,
+        password: bcrypt.hashSync(password, 10 )
+      });
+
+      const savedUser = await this.userRepository.save(user);
 
       return {
         ...instanceToPlain(savedUser),
@@ -97,11 +148,56 @@ export class AuthService {
   //   return `This action removes a #${id} auth`;
   // }
 
+
+
   private handleDBErrors(error: any): never {
     if(error.code === '23505' ) throw new BadRequestException(error.detail)
 
-    console.log(error);
+    // console.log(error);
+    this.logger.error(error);
+    this.logger.log(error);
     throw new InternalServerErrorException('Please check server logs');
   }
+
+  async deleteAllUsers () {
+    const query = this.userRepository.createQueryBuilder('order');
+
+    try {
+      
+      return await query
+        .delete()
+        .where({})
+        .execute();
+
+    } catch (error) {
+      
+      this.handleDBErrors(error)
+
+    }
+  }
+
+   async createSeed( createUserDto: CreateUserDto) {
+
+    try {
+
+      const { password, ...userData} = createUserDto;
+      
+      const user = this.userRepository.create({
+        ...userData,
+        password: bcrypt.hashSync(password, 10 )
+      });
+
+      const savedUser = await this.userRepository.save(user);
+
+      return savedUser;
+
+
+      
+    } catch (error) { 
+        this.handleDBErrors(error);
+    }
+
+  }
+
 
 }

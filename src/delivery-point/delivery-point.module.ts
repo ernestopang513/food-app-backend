@@ -11,6 +11,7 @@ import { DeliveryPoint } from './entities/delivery-point.entity';
     TypeOrmModule.forFeature([
       DeliveryPoint
     ])
-  ]
+  ],
+  exports: [DeliveryPointService]
 })
 export class DeliveryPointModule {}

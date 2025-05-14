@@ -91,9 +91,9 @@ export class FoodStandsService {
 
   async remove(id: string) {
 
-    const foodStand = await this.findOne( id )
+    const foodStand = await this.findOne( id );
     
-    await this.foodStandRepository.remove( foodStand )
+    await this.foodStandRepository.remove( foodStand );
 
 
     
@@ -105,6 +105,7 @@ export class FoodStandsService {
     if (error.code === '23505')
       throw new BadRequestException(error.detail);
     this.logger.error(error);
+    this.logger.log(error);
     throw new InternalServerErrorException('Unexpected error, check server logs');
 
   }

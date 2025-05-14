@@ -74,6 +74,17 @@ export class DeliveryPointService {
     await this.deliveryPointRepository.remove(deliveryPoint);
   }
 
+  async deleteAllDeliveryPoints () {
+    const query = this.deliveryPointRepository.createQueryBuilder('deliveryPoint');
+    try {
+      return await query
+        .delete()
+        .where({})
+        .execute();
+    } catch (error) {
+      this.handleDBExceptions(error)
+    }
+  }
 
   private handleDBExceptions(error: any): never {
       if (error.code === '23505')

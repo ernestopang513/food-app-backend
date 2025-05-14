@@ -4,6 +4,7 @@ import { OrderController } from './order.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Order } from './entities/order.entity';
 import { OrderDish } from './entities/order-dish.entity';
+import { User } from 'src/auth/entities/user.entity';
 
 @Module({
   controllers: [OrderController],
@@ -11,7 +12,8 @@ import { OrderDish } from './entities/order-dish.entity';
   imports: [
     TypeOrmModule.forFeature([
       Order,
-      OrderDish
+      OrderDish,
+      User,
     ])
   ]
 })

@@ -1,11 +1,14 @@
-import { BadRequestException, Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Order } from './entities/order.entity';
 import { DataSource, In, Repository } from 'typeorm';
 import { OrderDish } from './entities/order-dish.entity';
-import { Dish } from 'src/dish/entities/dish.entity';
+import { DeliveryPoint } from 'src/delivery-point/entities/delivery-point.entity';
+import { User } from 'src/auth/entities/user.entity';
+import { OrderStatus } from './enums/order-status.enum';
+import { FoodStandDish } from 'src/food-stand-dish/entities/food-stand-dish.entity';
 
 @Injectable()
 export class OrderService {
@@ -14,82 +17,113 @@ export class OrderService {
 
   constructor (
 
-    private readonly dataSource: DataSource
+    @InjectRepository(Order)
+    private readonly orderRepository: Repository<Order>,
+
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
+
+    private readonly dataSource: DataSource,
 
   ) {}
-  
+
+
 
   async create(createOrderDto: CreateOrderDto) {
 
     const queryRunner = this.dataSource.createQueryRunner();
-
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
     try {
-      
+      const { userId, deliveryPoint: deliveryPointId, foodStandId } = createOrderDto;
+
+      const user = await queryRunner.manager.findOne(User, { where: { id: userId } });
+      if (!user) throw new BadRequestException('User not found');
+
+      const deliveryPoint = await queryRunner.manager.findOne(DeliveryPoint, {
+        where: { id: deliveryPointId },
+      });
+      if (!deliveryPoint) throw new BadRequestException('Delivery Point not found');
+
       const dishIds = createOrderDto.items.map(item => item.dishId);
-      const dishes = await queryRunner.manager.find(Dish, {
-        where: {id: In(dishIds)}
+
+
+      const foodStandDishes = await queryRunner.manager.find(FoodStandDish, {
+        where: {
+          foodStand: { id: foodStandId },
+          dish: In(dishIds),
+        },
+        relations: ['dish'],
       });
 
-      // console.log('IDs recibidos del cliente:', dishIds);
 
-      // console.log('Platos encontrados en DB:', dishes.map(d => d.id));
-
-      if (dishes.length !== dishIds.length) {
-        throw new BadRequestException('Uno o más platillos no existen');
+      if (foodStandDishes.length !== dishIds.length) {
+        throw new BadRequestException('Uno o más platillos no existen o no pertenecen al puesto solicitado');
       }
-      //Previo total de la orden
-      // const total_price = createOrderDto.items.reduce((sum, item) => sum + item.subtotal, 0)
-      
-      const dishMap = new Map(dishes.map(dish => [dish.id, dish.price]));
+
+      const fsDishMap = new Map<string, FoodStandDish>(
+        foodStandDishes.map(fsd => [fsd.dish.id, fsd])
+      );
 
       let total_price = 0;
+
       const orderItems = createOrderDto.items.map(item => {
-        const price = dishMap.get(item.dishId);
-        if (price === undefined) {
-          throw new BadRequestException(`Platillo con ID ${item.dishId} no existe`);
+        const fsd = fsDishMap.get(item.dishId);
+        if (!fsd) {
+          throw new BadRequestException(`Platillo con ID ${item.dishId} no está disponible en este puesto`);
         }
-        const subtotal = price * item.quantity;
-        total_price += subtotal
+
+        if (!fsd.is_active) {
+          throw new BadRequestException(`Platillo ${fsd.dish.name} está inactivo`);
+        }
+
+        if (fsd.quantity === 0) {
+          throw new BadRequestException(`Platillo ${fsd.dish.name} no tiene stock disponible`);
+        }
+
+        if (item.quantity > fsd.quantity) {
+          throw new BadRequestException(
+            `Cantidad solicitada (${item.quantity}) supera el stock disponible (${fsd.quantity}) para ${fsd.dish.name}`
+          );
+        }
+
+        const subtotal = fsd.dish.price * item.quantity;
+        total_price += subtotal;
 
         return {
           quantity: item.quantity,
           subtotal,
-          dishId: item.dishId
-        }
-
+          dish: fsd.dish,
+          fsDish: fsd,
+        };
       });
 
       const order = queryRunner.manager.create(Order, {
         totalPrice: total_price,
         paymentMethod: createOrderDto.paymentMethod,
+        deliveryPoint,
+        user,
       });
 
       await queryRunner.manager.save(order);
 
       for (const item of orderItems) {
-
-        const dishEntity = dishes.find(d=> d.id === item.dishId);
-
-        if (!dishEntity) {
-          throw new BadRequestException(`Platillo con ID ${item.dishId} no fue encontrado`)
-        }
-
-        const orderItem = queryRunner.manager.create(OrderDish, {
+        const orderDish = queryRunner.manager.create(OrderDish, {
           quantity: item.quantity,
           subtotal: item.subtotal,
-          order: order,
-          dish: dishEntity
+          dish: item.dish,
+          order,
         });
-        await queryRunner.manager.save(orderItem);
+        await queryRunner.manager.save(orderDish);
+
+        item.fsDish.quantity -= item.quantity;
+        await queryRunner.manager.save(item.fsDish);
       }
 
       await queryRunner.commitTransaction();
 
       this.logger.log(`Orden ${order.id} creada correctamente`);
-
       return order;
 
     } catch (error) {
@@ -99,47 +133,188 @@ export class OrderService {
     } finally {
       await queryRunner.release();
     }
+
   }
 
-
-
-
-
-  // async create(createOrderDto: CreateOrderDto) {
-
-  //   try {
-
-  //     const order = this.orderRepository.create(createOrderDto);
-  //     await this.orderRepository.save(order);
-
-  //     return order;
-      
-  //   } catch (error) {
-  //     this.handleDBExceptions(error);
-  //   }
-  // }
 
   findAll() {
-    return `This action returns all order`;
+    return this.orderRepository.find({});
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} order`;
+  findAllWaitingOrders() {
+    return this.orderRepository.find({
+      where: {status: OrderStatus.PENDIENTE},
+      relations: ['deliveryPoint', 'user', 'deliveryUser']
+    });
+  }
+  
+  findAllCanceledOrders() {
+    return this.orderRepository.find({
+      where: {status: OrderStatus.CANCELADO},
+      relations: ['deliveryPoint', 'user', 'deliveryUser']
+    });
   }
 
-  update(id: number, updateOrderDto: UpdateOrderDto) {
-    return `This action updates a #${id} order`;
+  async findOne(id: string) {
+    try {
+
+      const order = await this.orderRepository.findOneBy({id});
+
+      if ( !order ) {
+        throw new NotFoundException(`Orden con id: ${id} no encontrada`)
+      }
+
+      return order;
+      
+    } catch (error) {
+      this.handleDBExceptions(error)
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} order`;
+  async assignDeliveryUser(id: string, updateOrderDto: UpdateOrderDto) {
+
+    const order = await this.orderRepository.findOne({
+      where: { id },
+      relations: ['deliveryUser' ]
+    });
+    if (!order ) throw new NotFoundException('Order not found.');
+
+    // console.log(order.deliveryUser)
+    
+    const deliveryUser = await this.userRepository.findOne({ 
+      where: {
+        id: updateOrderDto.userId,
+        isActive: true,
+      }
+    })
+    
+    // console.log(deliveryUser)
+
+    if (!deliveryUser) throw new NotFoundException('Delivery user not found');
+
+    if ( !order.deliveryUser ) {
+      order.deliveryUser = deliveryUser;
+    } 
+    
+    if ( order.deliveryUser.id !== deliveryUser.id) {
+      console.log('no son el mismo repartidor')
+      throw new BadRequestException('Solo el mismo repartidor puede cambiar status')
+    }
+    
+    order.status = updateOrderDto.status || OrderStatus.EN_CAMINO ;
+
+    return this.orderRepository.save(order);
+
   }
+
+  async deliveryUserOrders(deliveryUserId: string) {
+
+    return this.orderRepository.find({
+      where: {
+        deliveryUser: { id: deliveryUserId }
+      },
+      relations: ['deliveryPoint']
+    });
+
+  }
+  
+  async userOrders(userId: string) {
+    return this.orderRepository.find({
+      where: {
+        user: { id: userId },
+        status: OrderStatus.PENDIENTE
+      },
+    });
+  }
+
+  async cancelOrder(id: string , updateOrderDto: UpdateOrderDto) {
+
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+
+      const order = await queryRunner.manager.findOne(Order, {
+        where: {id: id},
+        relations: ['orderDish', 'orderDish.dish', 'user']
+      } )
+      
+      if (!order) {
+        throw new NotFoundException(`Orden con id ${id} no encontrada.`);
+      }
+
+      if ( order.user.id !== updateOrderDto.userId ) {
+        throw new BadRequestException(`Acción no permitida`);
+      }
+
+      if (order.status !== OrderStatus.PENDIENTE) {
+        throw new BadRequestException('Solo se pueden cancelar órdenes en estado Pendiente')
+      }
+
+      for (const orderDish of order.orderDish) {
+        const fsDish = await queryRunner.manager.findOne(FoodStandDish, {
+          where: {
+            dish: {id: orderDish.dish.id}
+          }
+        });
+
+        if (fsDish) {
+          fsDish.quantity += orderDish.quantity;
+          await queryRunner.manager.save(fsDish);
+        }
+      }
+
+        order.status = OrderStatus.CANCELADO;
+        await queryRunner.manager.save(order);
+
+        await queryRunner.commitTransaction();
+        this.logger.log(`Orden ${order.id} cancelada correctamente.`);
+        return  {message: 'Orden cancelada correctamente'};
+
+    } catch (error) {
+
+      await queryRunner.rollbackTransaction();
+      this.logger.error('Error al cancelar la orden:', error);
+      throw new InternalServerErrorException('No se pudo cancelar la orden.');
+
+    } finally {
+      await queryRunner.release();
+    }
+}
+
+
+  async remove(id: string) {
+
+    const order = await this.findOne(id);
+
+    await this.orderRepository.remove(order);
+
+  }
+
+
+  async deleteAllOrders () {
+    const query = this.orderRepository.createQueryBuilder('order');
+
+    try {
+      return await query
+        .delete()
+        .where({})
+        .execute();
+    } catch (error) {
+      this.handleDBExceptions(error)
+    }
+
+  }
+
 
   private handleDBExceptions(error: any): never {
     if (error.code === '23505')
       throw new BadRequestException(error.detail);
     this.logger.error(error);
+    this.logger.log(error);
     throw new InternalServerErrorException('Unexpected error, check server logs');
-
   }
 }
+
+

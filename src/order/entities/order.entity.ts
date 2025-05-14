@@ -1,8 +1,9 @@
-import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { OrderStatus } from "../enums/order-status.enum";
 import { OrderPaymentMethod } from "../enums/order-payment-method.enum";
 import { OrderDish } from "./order-dish.entity";
 import { DeliveryPoint } from "src/delivery-point/entities/delivery-point.entity";
+import { User } from "src/auth/entities/user.entity";
 
 
 @Entity()
@@ -47,14 +48,34 @@ export class Order {
     @OneToMany(
         () => OrderDish,
         (orderDish) => orderDish.order,
-        {cascade: true} 
+        {cascade: true, eager: false} 
     )
     orderDish: OrderDish[];
 
     @ManyToOne(
         () => DeliveryPoint,
-        (deliveryPoint) => deliveryPoint,
+        (deliveryPoint) => deliveryPoint.order,
         {onDelete: 'CASCADE'}         
     )
     deliveryPoint: DeliveryPoint;
+    
+    @ManyToOne(
+        () => User,
+        (user) => user.ordersCreated,
+        {onDelete: 'CASCADE'}         
+    )
+    user: User ;
+    
+    @ManyToOne(
+        () => User,
+        (user) => user.ordersDelivered,
+        {onDelete: 'CASCADE'}         
+    )
+    // @JoinColumn({name: 'deliveryUserId'}) 
+    deliveryUser: User ;
+    
+    // @Column({
+    //     nullable: true
+    // })
+    // deliveryUserId: string;
 }

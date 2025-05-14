@@ -16,19 +16,72 @@ export class OrderController {
   findAll() {
     return this.orderService.findAll();
   }
+  
+  @Get('waiting')
+  findAllWaitingOrders() {
+    return this.orderService.findAllWaitingOrders();
+  }
+  
+  @Get('canceled')
+  findAllCanceledOrders() {
+    return this.orderService.findAllCanceledOrders();
+  }
+
+  @Get('deliveryUserOrders/:deliveryUserId')
+  deliveryUserOrders(
+    @Param('deliveryUserId') deliveryUserId: string,
+    // @Body() updateOrderDto: UpdateOrderDto 
+  ) {
+    return this.orderService.deliveryUserOrders(deliveryUserId);
+  }
+  
+  @Get('userOrders/:userId')
+  userOrders(
+    @Param('userId') userId: string,
+  ) {
+    return this.orderService.userOrders(userId);
+  }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.orderService.findOne(+id);
+    return this.orderService.findOne(id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateOrderDto: UpdateOrderDto) {
-    return this.orderService.update(+id, updateOrderDto);
+  @Patch(':id/assign-delivery')
+  async assingDeliveryUser(
+    @Param('id') id: string, 
+    @Body() updateOrderDto: UpdateOrderDto) {
+
+    return this.orderService.assignDeliveryUser(id, updateOrderDto);
+    
   }
+ 
+  @Patch(':id/cancel')
+  cancelOrder(
+
+    @Param('id') id: string, 
+
+    @Body() updateOrderDto: UpdateOrderDto
+
+  ) {
+    
+    return this.orderService.cancelOrder(id, updateOrderDto);
+    
+  }
+  
+  // @Patch(':id')
+  // update(@Param('id') id: string, @Body() createOrderDto: CreateOrderDto) {
+  //   return this.orderService.update(id, createOrderDto);
+  // }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.orderService.remove(+id);
+    return this.orderService.remove(id);
   }
+  
+  @Delete(':id')
+  remove2(@Param('id') id: string) {
+    return this.orderService.remove(id);
+  }
+  
 }

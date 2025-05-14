@@ -2,6 +2,7 @@ import { IsArray, IsEnum, IsInt, IsString, IsUUID, ValidateNested } from "class-
 import { OrderPaymentMethod } from "../enums/order-payment-method.enum";
 import { OrderStatus } from "../enums/order-status.enum";
 import { Type } from "class-transformer";
+import { DeliveryPoint } from "src/delivery-point/entities/delivery-point.entity";
 
 
 export class OrderItemDto {
@@ -12,7 +13,6 @@ export class OrderItemDto {
 
     @IsInt()
     quantity: number;
-
 
 }
 
@@ -26,6 +26,22 @@ export class CreateOrderDto {
     @ValidateNested({ each: true})
     @Type(() => OrderItemDto)
     items: OrderItemDto[];
+
+    @IsString()
+    @IsUUID()
+    deliveryPoint: string;
+
+    @IsString()
+    @IsUUID()
+    userId: string;
+
+    @IsUUID()
+    @IsString()
+    foodStandId: string;
+   
+    // @IsString()
+    // @IsUUID()
+    // deliveryUserId: string;
 
 }
 

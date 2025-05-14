@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Order } from "./order.entity";
 import { Dish } from "src/dish/entities/dish.entity";
 
@@ -23,9 +23,10 @@ export class OrderDish {
 
         () => Order,
         (order) => order.orderDish,
-        {onDelete: 'CASCADE'}  
+        {onDelete: 'CASCADE', eager: true}  
 
     )
+    // @JoinColumn({name: 'orderId'})
     order: Order;
 
     @ManyToOne(

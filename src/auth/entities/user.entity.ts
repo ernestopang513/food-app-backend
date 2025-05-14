@@ -1,5 +1,6 @@
 import { Exclude } from "class-transformer";
-import { BeforeInsert, BeforeUpdate, Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Order } from "src/order/entities/order.entity";
+import { BeforeInsert, BeforeUpdate, Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 
 
@@ -37,6 +38,23 @@ export class User {
         default: 'user'
     })
     role: string;
+
+
+    @OneToMany(
+        () => Order,
+        (order) => order.user,
+        {cascade: true} 
+    )
+    ordersCreated: Order[];
+    
+    @OneToMany(
+        () => Order,
+        (order) => order.deliveryUser,
+        {cascade: true} 
+    )
+    ordersDelivered: Order[];
+    
+   
 
 
     @BeforeInsert()

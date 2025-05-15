@@ -39,8 +39,6 @@ export class AuthService {
 
       const savedUser = await this.userRepository.save(user);
 
-
-
       return {
         ...instanceToPlain(savedUser),
         token: this.getJwtToken({id: user.id})
@@ -48,7 +46,6 @@ export class AuthService {
     } catch (error) { 
         this.handleDBErrors(error);
     }
-
   }
   
   async createAdmin( createUserDto: CreateUserDto) {
@@ -56,7 +53,7 @@ export class AuthService {
     try {
 
       const { password, ...userData} = createUserDto;
-      
+ 
       const user = this.userRepository.create({
         ...userData,
         role: UserRole.ADMIN,
@@ -72,7 +69,6 @@ export class AuthService {
     } catch (error) { 
         this.handleDBErrors(error);
     }
-
   }
   
   async createEmployee( createUserDto: CreateUserDto) {
@@ -96,7 +92,6 @@ export class AuthService {
     } catch (error) { 
         this.handleDBErrors(error);
     }
-
   }
 
 
@@ -109,7 +104,6 @@ export class AuthService {
     })
 
     if(!user)  throw new UnauthorizedException('Credentials are not valid (email) ');
-
 
     if (!bcrypt.compareSync(password, user.password))
       throw new UnauthorizedException('Credentials are not valid');
@@ -132,6 +126,7 @@ export class AuthService {
     const token = this.jwtService.sign(payload);
     return token;
   }
+
   // findAll() {
   //   return `This action returns all auth`;
   // }
@@ -148,10 +143,13 @@ export class AuthService {
   //   return `This action removes a #${id} auth`;
   // }
 
+  validateAdminKey(key: string): boolean {
+    return key === process.env.ADMIN_SECRET_KEY;
+  }
 
 
   private handleDBErrors(error: any): never {
-    if(error.code === '23505' ) throw new BadRequestException(error.detail)
+    if(error.code === '23505' ) throw new BadRequestException(error.detail);
 
     // console.log(error);
     this.logger.error(error);
@@ -171,7 +169,7 @@ export class AuthService {
 
     } catch (error) {
       
-      this.handleDBErrors(error)
+      this.handleDBErrors(error);
 
     }
   }
@@ -190,14 +188,10 @@ export class AuthService {
       const savedUser = await this.userRepository.save(user);
 
       return savedUser;
-
-
       
     } catch (error) { 
         this.handleDBErrors(error);
     }
 
   }
-
-
 }

@@ -27,4 +27,14 @@ export class CreateUserDto {
     @IsString()
     @MinLength(5)
     fullName: string;
+
+    
 }
+
+
+export class CreateAdminDto extends CreateUserDto {
+
+    @IsString()
+    adminKey: string
+}
+

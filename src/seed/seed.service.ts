@@ -4,7 +4,6 @@ import { FoodStand } from 'src/food-stands/entities/food-stand.entity';
 import { DishService } from 'src/dish/dish.service';
 import { InitialData } from './data/seed-data';
 import { Dish } from 'src/dish/entities/dish.entity';
-import { InjectRepository } from '@nestjs/typeorm';
 import { FoodStandDishService } from 'src/food-stand-dish/food-stand-dish.service';
 import { AuthService } from 'src/auth/auth.service';
 import { User } from 'src/auth/entities/user.entity';
@@ -15,10 +14,8 @@ import { DeliveryPoint } from 'src/delivery-point/entities/delivery-point.entity
 export class SeedService {
 
   constructor (
-    private readonly foodStandService: FoodStandsService,
 
-    // @InjectRepository(FoodStand)
-    // private readonly foodStandRepository: FoodStandsRepository,
+    private readonly foodStandService: FoodStandsService,
 
     private readonly dishService: DishService,
 

@@ -5,7 +5,7 @@ import { GetUser } from './decorators/get-user.decorator';
 import { User } from './entities/user.entity';
 import { Auth } from './decorators';
 import { ValidRoles } from './interfaces/valid-roles';
-import { CreateAdminDto } from './dto/create-user.dto';
+import { CreateAdminDto, CreateEmployeeDto } from './dto/create-user.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -17,12 +17,18 @@ export class AuthController {
   }
   
   @Post('register-employee')
-  createUserEmployee(@Body() createUserDto: CreateUserDto) {
+  createUserEmployee(@Body() createEmployeeDto: CreateEmployeeDto) {
+
+    const {employeeKey, ...createUserDto} = createEmployeeDto;
+
+    if(!this.authService.validateEmployeeKey(employeeKey)) {
+      throw new UnauthorizedException('Clave incoreecta para crear un trabajador.')
+    }
+
     return this.authService.createEmployee(createUserDto);
   }
   
   @Post('register-admin')
-
   createUserAdmin(@Body() createAdminDto: CreateAdminDto) {
 
     const {adminKey, ...createUserDto} = createAdminDto;
@@ -58,7 +64,7 @@ export class AuthController {
 
   @Get('private')
 
-  @Auth(ValidRoles.admin)
+  @Auth(ValidRoles.ADMIN)
   privateRoute(
     @GetUser() user: User
   ) {

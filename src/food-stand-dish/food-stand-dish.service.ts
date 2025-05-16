@@ -45,7 +45,7 @@ export class FoodStandDishService {
       ...createFoodStandDishDto,
       foodStand,
       dish
-    })
+    });
     return this.foodStandDishRepository.save(foodStandDish);
   }
 

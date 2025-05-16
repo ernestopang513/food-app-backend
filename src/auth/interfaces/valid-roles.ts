@@ -3,7 +3,7 @@
 
 
 export enum ValidRoles {
-    admin = 'admin',
-    trabajador = 'trabajador',
-    user = 'user'
+    ADMIN = 'admin',
+    EMPLOYEE = 'employee',
+    USER = 'user'
 }

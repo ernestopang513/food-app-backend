@@ -2,8 +2,11 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { OrderService } from './order.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
+import { Auth } from 'src/auth/decorators';
+import { ValidRoles } from 'src/auth/interfaces';
 
 @Controller('order')
+@Auth()
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
@@ -48,6 +51,7 @@ export class OrderController {
   }
 
   @Patch(':id/assign-delivery')
+  @Auth(ValidRoles.EMPLOYEE)
   async assingDeliveryUser(
     @Param('id') id: string, 
     @Body() updateOrderDto: UpdateOrderDto) {
@@ -75,13 +79,14 @@ export class OrderController {
   // }
 
   @Delete(':id')
+  @Auth(ValidRoles.ADMIN, ValidRoles.EMPLOYEE)
   remove(@Param('id') id: string) {
     return this.orderService.remove(id);
   }
   
-  @Delete(':id')
-  remove2(@Param('id') id: string) {
-    return this.orderService.remove(id);
-  }
+  // @Delete(':id')
+  // remove2(@Param('id') id: string) {
+  //   return this.orderService.remove(id);
+  // }
   
 }

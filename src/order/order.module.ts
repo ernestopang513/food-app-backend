@@ -5,6 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Order } from './entities/order.entity';
 import { OrderDish } from './entities/order-dish.entity';
 import { User } from 'src/auth/entities/user.entity';
+import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
   controllers: [OrderController],
@@ -14,7 +15,8 @@ import { User } from 'src/auth/entities/user.entity';
       Order,
       OrderDish,
       User,
-    ])
+    ]),
+    AuthModule
   ]
 })
 export class OrderModule {}

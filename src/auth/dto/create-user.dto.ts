@@ -35,6 +35,12 @@ export class CreateUserDto {
 export class CreateAdminDto extends CreateUserDto {
 
     @IsString()
-    adminKey: string
+    adminKey: string;
+}
+
+export class CreateEmployeeDto extends CreateUserDto {
+
+    @IsString()
+    employeeKey: string;
 }
 

@@ -42,7 +42,7 @@ export class DeliveryPointService {
       if (!deliveryPoint) throw new NotFoundException(`Delivery point with id: ${id} not found.`)
       return deliveryPoint;
     } catch (error) {
-      this.handleDBExceptions(error)
+      this.handleDBExceptions(error);
     }
   }
 

@@ -122,7 +122,6 @@ export class AuthService {
   }
 
   private getJwtToken( payload: JwtPayload) {
-
     const token = this.jwtService.sign(payload);
     return token;
   }
@@ -146,6 +145,10 @@ export class AuthService {
   validateAdminKey(key: string): boolean {
     return key === process.env.ADMIN_SECRET_KEY;
   }
+  
+  validateEmployeeKey(key: string): boolean {
+    return key === process.env.EMPLOYEE_SECRET_KEY;
+  }
 
 
   private handleDBErrors(error: any): never {
@@ -168,7 +171,7 @@ export class AuthService {
         .execute();
 
     } catch (error) {
-      
+
       this.handleDBErrors(error);
 
     }

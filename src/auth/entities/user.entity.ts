@@ -2,6 +2,7 @@ import { Exclude } from "class-transformer";
 import { Order } from "src/order/entities/order.entity";
 import { BeforeInsert, BeforeUpdate, Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { UserRole } from "../enums/user-role.enum";
+import { ValidRoles } from "../interfaces/valid-roles";
 
 
 
@@ -37,9 +38,9 @@ export class User {
 
     @Column({
         type: 'enum',
-        enum: UserRole,
+        enum: ValidRoles,
         nullable: false,
-        default: UserRole.USER
+        default: ValidRoles.USER
     })
     role: string;
 

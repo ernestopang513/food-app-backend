@@ -2,12 +2,15 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, ParseUUIDPipe } from
 import { FoodStandsService } from './food-stands.service';
 import { CreateFoodStandDto } from './dto/create-food-stand.dto';
 import { UpdateFoodStandDto } from './dto/update-food-stand.dto';
+import { Auth } from 'src/auth/decorators';
+import { ValidRoles } from 'src/auth/interfaces';
 
 @Controller('food-stands')
 export class FoodStandsController {
   constructor(private readonly foodStandsService: FoodStandsService) {}
 
   @Post()
+  @Auth(ValidRoles.ADMIN)
   create(@Body() createFoodStandDto: CreateFoodStandDto) {
     return this.foodStandsService.create(createFoodStandDto);
   }

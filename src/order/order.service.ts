@@ -9,6 +9,8 @@ import { DeliveryPoint } from 'src/delivery-point/entities/delivery-point.entity
 import { User } from 'src/auth/entities/user.entity';
 import { OrderStatus } from './enums/order-status.enum';
 import { FoodStandDish } from 'src/food-stand-dish/entities/food-stand-dish.entity';
+import { FoodStand } from 'src/food-stands/entities/food-stand.entity';
+import { estimateBicycleTimeMinutes, haversineDistance } from 'src/common/utils/distance.util';
 
 @Injectable()
 export class OrderService {
@@ -46,8 +48,26 @@ export class OrderService {
       });
       if (!deliveryPoint) throw new BadRequestException('Delivery Point not found');
 
-      const dishIds = createOrderDto.items.map(item => item.dishId);
+      const foodStand = await queryRunner.manager.findOne(FoodStand, {
+        where: {id: foodStandId}
+      })
 
+      if (!foodStand) throw new BadRequestException('Food Stand not found.');
+
+      if(!foodStand.latitude || !foodStand.longitude || !deliveryPoint.latitude || !deliveryPoint.longitude) {
+        throw new BadRequestException('Faltan coordenadas para calcular el tiempo estimado.')
+      }
+
+      const distanceKm = haversineDistance(
+        foodStand.latitude,
+        foodStand.longitude,
+        deliveryPoint.latitude,
+        deliveryPoint.longitude
+      );
+
+      const estimatedTimeMinutes = estimateBicycleTimeMinutes(distanceKm)
+
+      const dishIds = createOrderDto.items.map(item => item.dishId);
 
       const foodStandDishes = await queryRunner.manager.find(FoodStandDish, {
         where: {
@@ -104,6 +124,7 @@ export class OrderService {
         paymentMethod: createOrderDto.paymentMethod,
         deliveryPoint,
         user,
+        estimatedTimeMinutes
       });
 
       await queryRunner.manager.save(order);

@@ -4,6 +4,9 @@ import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { Auth } from 'src/auth/decorators';
 import { ValidRoles } from 'src/auth/interfaces';
+import { ApiResponse } from '@nestjs/swagger';
+import { ApiResponses } from 'src/common/swagger/api-responses';
+import { Order } from './entities/order.entity';
 
 @Controller('order')
 @Auth()
@@ -11,26 +14,50 @@ export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
   @Post()
+  @ApiResponse({status: 201, description: 'Orden creada', type: Order})
+  @ApiResponse(ApiResponses.BadRequest)
+  @ApiResponse(ApiResponses.Unauthorized)
+  @ApiResponse(ApiResponses.ServerError)
   create(@Body() createOrderDto: CreateOrderDto) {
     return this.orderService.create(createOrderDto);
   }
 
   @Get()
+  @ApiResponse({status: 200, description: 'Listado de ordenes', type: [Order]})
+  @ApiResponse(ApiResponses.ServerError)
+  @ApiResponse(ApiResponses.BadRequest)
+  @ApiResponse(ApiResponses.NotFound)
+  @ApiResponse(ApiResponses.Unauthorized)
   findAll() {
     return this.orderService.findAll();
   }
   
   @Get('waiting')
+  @ApiResponse({status: 200, description: 'Listado de todas las ordenes pendientes', type: [Order]})
+  @ApiResponse(ApiResponses.ServerError)
+  @ApiResponse(ApiResponses.BadRequest)
+  @ApiResponse(ApiResponses.NotFound)
+  @ApiResponse(ApiResponses.Unauthorized)
   findAllWaitingOrders() {
     return this.orderService.findAllWaitingOrders();
   }
   
   @Get('canceled')
+  @ApiResponse({status: 200, description: 'Listado de todas las ordenes canceladas', type: [Order]})
+  @ApiResponse(ApiResponses.ServerError)
+  @ApiResponse(ApiResponses.BadRequest)
+  @ApiResponse(ApiResponses.NotFound)
+  @ApiResponse(ApiResponses.Unauthorized)
   findAllCanceledOrders() {
     return this.orderService.findAllCanceledOrders();
   }
 
   @Get('deliveryUserOrders/:deliveryUserId')
+  @ApiResponse({status: 200, description: 'Listado de todas las ordenes del repartidor que las pide', type: [Order]})
+  @ApiResponse(ApiResponses.ServerError)
+  @ApiResponse(ApiResponses.BadRequest)
+  @ApiResponse(ApiResponses.NotFound)
+  @ApiResponse(ApiResponses.Unauthorized)
   deliveryUserOrders(
     @Param('deliveryUserId') deliveryUserId: string,
     // @Body() updateOrderDto: UpdateOrderDto 
@@ -39,6 +66,11 @@ export class OrderController {
   }
   
   @Get('userOrders/:userId')
+  @ApiResponse({status: 200, description: 'Listado de todas las ordenes de un usuario', type: [Order]})
+  @ApiResponse(ApiResponses.ServerError)
+  @ApiResponse(ApiResponses.BadRequest)
+  @ApiResponse(ApiResponses.NotFound)
+  @ApiResponse(ApiResponses.Unauthorized)
   userOrders(
     @Param('userId') userId: string,
   ) {
@@ -46,12 +78,22 @@ export class OrderController {
   }
 
   @Get(':id')
+  @ApiResponse({status: 200, description: 'Orden especifica', type: Order})
+  @ApiResponse(ApiResponses.ServerError)
+  @ApiResponse(ApiResponses.BadRequest)
+  @ApiResponse(ApiResponses.NotFound)
+  @ApiResponse(ApiResponses.Unauthorized)
   findOne(@Param('id') id: string) {
     return this.orderService.findOne(id);
   }
 
   @Patch(':id/assign-delivery')
   @Auth(ValidRoles.EMPLOYEE)
+  @ApiResponse({status: 200, description: 'Actualizado correctamente'})
+  @ApiResponse(ApiResponses.BadRequest)
+  @ApiResponse(ApiResponses.Unauthorized)
+  @ApiResponse(ApiResponses.NotFound)
+  @ApiResponse(ApiResponses.ServerError)
   async assingDeliveryUser(
     @Param('id') id: string, 
     @Body() updateOrderDto: UpdateOrderDto) {
@@ -61,6 +103,11 @@ export class OrderController {
   }
  
   @Patch(':id/cancel')
+  @ApiResponse({status: 200, description: 'Cancela correctamente la'})
+  @ApiResponse(ApiResponses.BadRequest)
+  @ApiResponse(ApiResponses.Unauthorized)
+  @ApiResponse(ApiResponses.NotFound)
+  @ApiResponse(ApiResponses.ServerError)
   cancelOrder(
 
     @Param('id') id: string, 
@@ -80,6 +127,11 @@ export class OrderController {
 
   @Delete(':id')
   @Auth(ValidRoles.ADMIN, ValidRoles.EMPLOYEE)
+  @ApiResponse({status: 200, description: 'Eliminado exitosamente'})
+  @ApiResponse(ApiResponses.BadRequest)
+  @ApiResponse(ApiResponses.ServerError)
+  @ApiResponse(ApiResponses.Unauthorized)
+  @ApiResponse(ApiResponses.Forbidden)
   remove(@Param('id') id: string) {
     return this.orderService.remove(id);
   }

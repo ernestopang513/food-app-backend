@@ -6,17 +6,25 @@ import { User } from './entities/user.entity';
 import { Auth } from './decorators';
 import { ValidRoles } from './interfaces/valid-roles';
 import { CreateAdminDto, CreateEmployeeDto } from './dto/create-user.dto';
+import { ApiResponse } from '@nestjs/swagger';
+import { ApiResponses } from 'src/common/swagger/api-responses';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('register')
+  @ApiResponse({ status: 201, description: 'User creado', type: User })
+  @ApiResponse(ApiResponses.BadRequest)
+  @ApiResponse(ApiResponses.ServerError)
   createUser(@Body() createUserDto: CreateUserDto) {
     return this.authService.create(createUserDto);
   }
   
   @Post('register-employee')
+  @ApiResponse({ status: 201, description: 'User employee creado', type: User })
+  @ApiResponse(ApiResponses.BadRequest)
+  @ApiResponse(ApiResponses.ServerError)
   createUserEmployee(@Body() createEmployeeDto: CreateEmployeeDto) {
 
     const {employeeKey, ...createUserDto} = createEmployeeDto;
@@ -24,11 +32,13 @@ export class AuthController {
     if(!this.authService.validateEmployeeKey(employeeKey)) {
       throw new UnauthorizedException('Clave incoreecta para crear un trabajador.')
     }
-
     return this.authService.createEmployee(createUserDto);
   }
   
   @Post('register-admin')
+  @ApiResponse({ status: 201, description: 'User admin creado', type: User })
+  @ApiResponse(ApiResponses.BadRequest)
+  @ApiResponse(ApiResponses.ServerError)
   createUserAdmin(@Body() createAdminDto: CreateAdminDto) {
 
     const {adminKey, ...createUserDto} = createAdminDto;
@@ -42,6 +52,9 @@ export class AuthController {
   }
 
   @Post('login')
+  @ApiResponse({ status: 201, description: 'Login exitoso', type: User })
+  @ApiResponse(ApiResponses.BadRequest)
+  @ApiResponse(ApiResponses.ServerError)
   loginUser(@Body() loginUserDto: LoginUserDto) {
     return this.authService.login(loginUserDto);
   }
@@ -53,14 +66,14 @@ export class AuthController {
     //   return this.authService.create(createAuthDto);
     // }
     
-    @Get('check-status')
-    @Auth()
-    checkAuthStatuas(
-      @GetUser() user: User
-    ) {
-      return this.authService.checkAuthStatus(user);
-    }
-   
+  @Get('check-status')
+  @Auth()
+  checkAuthStatuas(
+    @GetUser() user: User
+  ) {
+    return this.authService.checkAuthStatus(user);
+  }
+
 
   @Get('private')
 
@@ -73,7 +86,7 @@ export class AuthController {
       user
     }
   }
-  
+
 
   // @Patch(':id')
   // update(@Param('id') id: string, @Body() updateAuthDto: UpdateAuthDto) {

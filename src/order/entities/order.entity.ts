@@ -4,20 +4,37 @@ import { OrderPaymentMethod } from "../enums/order-payment-method.enum";
 import { OrderDish } from "./order-dish.entity";
 import { DeliveryPoint } from "src/delivery-point/entities/delivery-point.entity";
 import { User } from "src/auth/entities/user.entity";
+import { ApiProperty } from "@nestjs/swagger";
 
 
 @Entity()
 export class Order {
 
+    @ApiProperty({
+            example: 'c8aeeb0b-f04b-40c1-9294-4b37576a4959',
+            description: 'Order ID',
+            uniqueItems: true
+        })
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
+    @ApiProperty({
+        example: 165,
+        description: 'Precio total de la orden',
+        required: true,
+        nullable: false
+    })
     @Column('int',{
         nullable: false,
-        default: 150
     })
     totalPrice: number;
 
+    @ApiProperty({
+        enum: OrderStatus,
+        enumName: 'OrderStatus',
+        example: OrderStatus.PENDIENTE,
+        description: 'Estado de la orden',
+    })
     @Column({
         type: 'enum',
         enum: OrderStatus,
@@ -26,6 +43,12 @@ export class Order {
     })
     status: OrderStatus;
 
+    @ApiProperty({
+        enum: OrderPaymentMethod,
+        enumName: 'OrderPaymentMethod',
+        example: OrderPaymentMethod.EFECTIVO,
+        description: 'Método de pago',
+    })
     @Column({
         type: 'enum',
         enum: OrderPaymentMethod,
@@ -34,17 +57,26 @@ export class Order {
     })
     paymentMethod: OrderPaymentMethod;
 
+    @ApiProperty({
+        example: 25,
+        description: 'Tiempo estimado de entrega en minutos',
+    })
     @Column('int', {
         default: 0,
     })
     estimatedTimeMinutes: number;
 
+    @ApiProperty({
+        example: '2025-05-16T12:34:56Z',
+        description: 'Fecha de creación',
+    })
     @Column({
         type: 'timestamp',
         default: () => 'CURRENT_TIMESTAMP',
     })
     createdAt: Date;
 
+    
     @OneToMany(
         () => OrderDish,
         (orderDish) => orderDish.order,
@@ -52,6 +84,10 @@ export class Order {
     )
     orderDish: OrderDish[];
 
+    @ApiProperty({
+        type: () => DeliveryPoint,
+        description: 'Punto de entrega asociado a la orden',
+    })
     @ManyToOne(
         () => DeliveryPoint,
         (deliveryPoint) => deliveryPoint.order,
@@ -59,6 +95,10 @@ export class Order {
     )
     deliveryPoint: DeliveryPoint;
     
+    @ApiProperty({
+        type: () => User,
+        description: 'Usuario que creó la orden',
+    })
     @ManyToOne(
         () => User,
         (user) => user.ordersCreated,
@@ -66,6 +106,10 @@ export class Order {
     )
     user: User ;
     
+    @ApiProperty({
+        type: () => User,
+        description: 'Usuario que entregó la orden (repartidor)',
+    })
     @ManyToOne(
         () => User,
         (user) => user.ordersDelivered,

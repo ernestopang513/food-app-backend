@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, UnauthorizedException } from '@nestjs/common';
+import { Controller, Get, Post, Body, UnauthorizedException, HttpCode } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto, LoginUserDto } from './dto';
 import { GetUser } from './decorators/get-user.decorator';
@@ -52,6 +52,7 @@ export class AuthController {
   }
 
   @Post('login')
+  @HttpCode(200)
   @ApiResponse({ status: 201, description: 'Login exitoso', type: User })
   @ApiResponse(ApiResponses.BadRequest)
   @ApiResponse(ApiResponses.ServerError)

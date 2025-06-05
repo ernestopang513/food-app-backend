@@ -41,7 +41,7 @@ export class CreateFoodStandDto {
     })
     @IsBoolean()
     @IsOptional()
-    is_open?: boolean;
+    isOpen?: boolean;
 
    
     @IsOptional()

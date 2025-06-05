@@ -56,7 +56,10 @@ export class FoodStandDishService {
   async findOne(id: string) {
 
     try {
-      const foodStandDish = await this.foodStandDishRepository.findOneBy({id});
+      const foodStandDish = await this.foodStandDishRepository.findOne({
+        where: {id},
+        relations: ['dish']
+      });
       if (!foodStandDish)
         throw new NotFoundException(`Food Stand Dish with id ${id} not found`)
       return foodStandDish;
@@ -67,12 +70,25 @@ export class FoodStandDishService {
 
   async update(id: string, updateFoodStandDishDto: UpdateFoodStandDishDto) {
 
-    const foodStandDish = await this.foodStandDishRepository.preload({
-      id:id,
-      ...updateFoodStandDishDto,
-    })
+    const {quantity, increment, is_active} = updateFoodStandDishDto
+
+    const foodStandDish = await this.foodStandDishRepository.findOne({where: {id}})
 
     if ( !foodStandDish ) throw new NotFoundException(`Food stand dish with id: ${id} not found`);
+
+    if(quantity !== undefined) {
+      if(increment) {
+
+        if((foodStandDish.quantity += quantity)  < 0) foodStandDish.quantity = 0  
+          
+      } else {
+        foodStandDish.quantity = quantity;
+      }
+    }
+
+    if(is_active !== undefined) {
+      foodStandDish.is_active = is_active;
+    }
 
     try {
       await this.foodStandDishRepository.save(foodStandDish);

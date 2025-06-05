@@ -54,7 +54,10 @@ export class FoodStandsService {
   
 
     try {
-      const foodStand = await this.foodStandRepository.findOneBy({ id }) ;
+      const foodStand = await this.foodStandRepository.findOne({ 
+        where: {id},
+        relations: ['foodStandDishes', 'foodStandDishes.dish']
+      }) ;
       if ( !foodStand )
         throw new NotFoundException(`Food Stand with id ${id} not found.`);
       

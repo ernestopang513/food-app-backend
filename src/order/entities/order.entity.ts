@@ -76,7 +76,17 @@ export class Order {
     })
     createdAt: Date;
 
-    
+
+     @ApiProperty({
+            example: 'c8aeeb0b-f04b-40c1-9294-4b37576a4959',
+            description: 'FoodStand ID'
+        })
+    @Column('uuid', {
+        nullable: false
+    })
+    foodStandId: string;
+
+
     @OneToMany(
         () => OrderDish,
         (orderDish) => orderDish.order,

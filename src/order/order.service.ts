@@ -11,6 +11,8 @@ import { OrderStatus } from './enums/order-status.enum';
 import { FoodStandDish } from 'src/food-stand-dish/entities/food-stand-dish.entity';
 import { FoodStand } from 'src/food-stands/entities/food-stand.entity';
 import { estimateBicycleTimeMinutes, haversineDistance } from 'src/common/utils/distance.util';
+import { FilterWaitingOrderDto } from './dto/filter-waiting-orders.dto';
+import { AssignDeliveryDto } from './dto/assingn-delivery-status.dto';
 
 @Injectable()
 export class OrderService {
@@ -52,7 +54,7 @@ export class OrderService {
         where: {id: foodStandId}
       })
 
-      if (!foodStand) throw new BadRequestException('Food Stand not found.');
+      if (!foodStand || !foodStand.isOpen) throw new BadRequestException('Food Stand not found.');
 
       if(!foodStand.latitude || !foodStand.longitude || !deliveryPoint.latitude || !deliveryPoint.longitude) {
         throw new BadRequestException('Faltan coordenadas para calcular el tiempo estimado.')
@@ -124,7 +126,8 @@ export class OrderService {
         paymentMethod: createOrderDto.paymentMethod,
         deliveryPoint,
         user,
-        estimatedTimeMinutes
+        estimatedTimeMinutes,
+        foodStandId: foodStand.id
       });
 
       await queryRunner.manager.save(order);
@@ -162,11 +165,73 @@ export class OrderService {
     return this.orderRepository.find({});
   }
 
-  findAllWaitingOrders() {
-    return this.orderRepository.find({
-      where: {status: OrderStatus.PENDIENTE},
-      relations: ['deliveryPoint', 'user', 'deliveryUser']
+   async findAllWaitingOrders(filterDto: FilterWaitingOrderDto) {
+
+    const {deliveryPointId, foodStandId} = filterDto
+
+
+    const where: any = {
+      status: OrderStatus.PENDIENTE,
+      foodStandId
+    }
+
+
+    if (deliveryPointId) {
+      where.deliveryPoint = {id: deliveryPointId};
+    }
+    const orders = await this.orderRepository.find({
+      where,
+      relations: ['deliveryPoint', 'user', 'deliveryUser', 'orderDish', 'orderDish.dish'],
+      order: {
+        createdAt: 'ASC'
+      }
     });
+
+     orders.forEach(order => {
+       order.orderDish.sort((a, b) => {
+         const nameA = a.dish.name.toLowerCase();
+         const nameB = b.dish.name.toLowerCase();
+         return nameA.localeCompare(nameB);
+       });
+     });
+
+     if(deliveryPointId) {
+      return orders;
+     }
+ 
+    //  const grouped = orders.reduce((acc, order) => {
+    //    const pointId = order.deliveryPoint.id;
+
+    //    if (!acc[pointId]) {
+    //      acc[pointId] = {
+    //        deliveryPoint: order.deliveryPoint,
+    //        orders: [],
+    //      };
+    //    }
+
+    //    acc[pointId].orders.push(order);
+    //    return acc;
+    //  }, {} as Record<string, { deliveryPoint: any; orders: typeof orders }>);
+
+    //  return Object.values(grouped);
+
+     const grouped = orders.reduce((acc, order) => {
+       const pointId = order.deliveryPoint.id;
+
+       if (!acc[pointId]) {
+         acc[pointId] = {
+           deliveryPoint: order.deliveryPoint,
+           orders: 0,
+         };
+       }
+
+       acc[pointId].orders += 1;
+       return acc;
+        }, {} as Record<string, { deliveryPoint: any; orders: number }>);
+
+     return Object.values(grouped);
+
+
   }
   
   findAllCanceledOrders() {
@@ -192,7 +257,7 @@ export class OrderService {
     }
   }
 
-  async assignDeliveryUser(id: string, updateOrderDto: UpdateOrderDto) {
+  async assignDeliveryUser(id: string, assingDeliveryDto: AssignDeliveryDto) {
 
     const order = await this.orderRepository.findOne({
       where: { id },
@@ -204,7 +269,7 @@ export class OrderService {
     
     const deliveryUser = await this.userRepository.findOne({ 
       where: {
-        id: updateOrderDto.userId,
+        id: assingDeliveryDto.userId,
         isActive: true,
       }
     })
@@ -222,7 +287,7 @@ export class OrderService {
       throw new BadRequestException('Solo el mismo repartidor puede cambiar status')
     }
     
-    order.status = updateOrderDto.status || OrderStatus.EN_CAMINO ;
+    order.status = assingDeliveryDto.status || OrderStatus.EN_CAMINO ;
 
     return this.orderRepository.save(order);
 

@@ -23,7 +23,7 @@ export class OrderDish {
 
         () => Order,
         (order) => order.orderDish,
-        {onDelete: 'CASCADE', eager: true}  
+        {onDelete: 'CASCADE', eager: false}  
 
     )
     // @JoinColumn({name: 'orderId'})

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { OrderService } from './order.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
@@ -7,6 +7,8 @@ import { ValidRoles } from 'src/auth/interfaces';
 import { ApiResponse } from '@nestjs/swagger';
 import { ApiResponses } from 'src/common/swagger/api-responses';
 import { Order } from './entities/order.entity';
+import { FilterWaitingOrderDto } from './dto/filter-waiting-orders.dto';
+import { AssignDeliveryDto } from './dto/assingn-delivery-status.dto';
 
 @Controller('order')
 @Auth()
@@ -38,8 +40,10 @@ export class OrderController {
   @ApiResponse(ApiResponses.BadRequest)
   @ApiResponse(ApiResponses.NotFound)
   @ApiResponse(ApiResponses.Unauthorized)
-  findAllWaitingOrders() {
-    return this.orderService.findAllWaitingOrders();
+  findAllWaitingOrders(
+    @Query() filterDto: FilterWaitingOrderDto
+  ) {
+    return this.orderService.findAllWaitingOrders(filterDto);
   }
   
   @Get('canceled')
@@ -88,7 +92,7 @@ export class OrderController {
   }
 
   @Patch(':id/assign-delivery')
-  @Auth(ValidRoles.EMPLOYEE)
+  @Auth(ValidRoles.EMPLOYEE, ValidRoles.ADMIN)
   @ApiResponse({status: 200, description: 'Actualizado correctamente'})
   @ApiResponse(ApiResponses.BadRequest)
   @ApiResponse(ApiResponses.Unauthorized)
@@ -96,9 +100,9 @@ export class OrderController {
   @ApiResponse(ApiResponses.ServerError)
   async assingDeliveryUser(
     @Param('id') id: string, 
-    @Body() updateOrderDto: UpdateOrderDto) {
+    @Body() assingDeliveryDto: AssignDeliveryDto) {
 
-    return this.orderService.assignDeliveryUser(id, updateOrderDto);
+    return this.orderService.assignDeliveryUser(id, assingDeliveryDto);
     
   }
  

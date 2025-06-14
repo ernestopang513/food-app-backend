@@ -4,7 +4,7 @@ import { IsOptional, IsUUID } from "class-validator";
 
 
 
-export class FilterWaitingOrderDto {
+export class FilterOrderDto {
 
     @ApiPropertyOptional({
         description: 'ID del punto de entrega',
@@ -23,3 +23,11 @@ export class FilterWaitingOrderDto {
     @IsUUID()
     foodStandId?: string;
 }
+
+
+
+
+
+
+
+

@@ -11,7 +11,7 @@ import { OrderStatus } from './enums/order-status.enum';
 import { FoodStandDish } from 'src/food-stand-dish/entities/food-stand-dish.entity';
 import { FoodStand } from 'src/food-stands/entities/food-stand.entity';
 import { estimateBicycleTimeMinutes, haversineDistance } from 'src/common/utils/distance.util';
-import { FilterWaitingOrderDto } from './dto/filter-waiting-orders.dto';
+import { FilterOrderDto } from './dto/filter-orders.dto';
 import { AssignDeliveryDto } from './dto/assingn-delivery-status.dto';
 
 @Injectable()
@@ -165,7 +165,7 @@ export class OrderService {
     return this.orderRepository.find({});
   }
 
-   async findAllWaitingOrders(filterDto: FilterWaitingOrderDto) {
+   async findAllWaitingOrders(filterDto: FilterOrderDto) {
 
     const {deliveryPointId, foodStandId} = filterDto
 
@@ -293,14 +293,57 @@ export class OrderService {
 
   }
 
-  async deliveryUserOrders(deliveryUserId: string) {
+  //* Endpoint para ordenes por repartidor
+  async deliveryUserOrders(deliveryUserId: string, filterDto: FilterOrderDto) {
 
-    return this.orderRepository.find({
-      where: {
-        deliveryUser: { id: deliveryUserId }
-      },
-      relations: ['deliveryPoint']
-    });
+    const { deliveryPointId, foodStandId } = filterDto;
+
+    const where: any = {
+      status: OrderStatus.EN_CAMINO,
+      foodStandId,
+      deliveryUser: {id: deliveryUserId }
+    }
+
+    if(deliveryPointId) {
+      where.deliveryPoint = {id: deliveryPointId};
+    }
+
+    const orders = await this.orderRepository.find({
+      where,
+      relations: [ 'deliveryPoint', 'user', 'deliveryUser', 'orderDish', 'orderDish.dish'],
+      order: {
+        createdAt: 'ASC'
+      }
+    })
+
+    orders.forEach(order => {
+       order.orderDish.sort((a, b) => {
+         const nameA = a.dish.name.toLowerCase();
+         const nameB = b.dish.name.toLowerCase();
+         return nameA.localeCompare(nameB);
+       });
+     });
+
+     if(deliveryPointId) {
+      return orders;
+     }
+
+     const grouped = orders.reduce((acc, order) => {
+       const pointId = order.deliveryPoint.id;
+
+       if (!acc[pointId]) {
+         acc[pointId] = {
+           deliveryPoint: order.deliveryPoint,
+           orders: 0,
+         };
+       }
+
+       acc[pointId].orders += 1;
+       return acc;
+        }, {} as Record<string, { deliveryPoint: any; orders: number }>);
+
+     return Object.values(grouped);
+
 
   }
   

@@ -7,7 +7,7 @@ import { ValidRoles } from 'src/auth/interfaces';
 import { ApiResponse } from '@nestjs/swagger';
 import { ApiResponses } from 'src/common/swagger/api-responses';
 import { Order } from './entities/order.entity';
-import { FilterWaitingOrderDto } from './dto/filter-waiting-orders.dto';
+import { FilterOrderDto } from './dto/filter-orders.dto';
 import { AssignDeliveryDto } from './dto/assingn-delivery-status.dto';
 
 @Controller('order')
@@ -41,7 +41,7 @@ export class OrderController {
   @ApiResponse(ApiResponses.NotFound)
   @ApiResponse(ApiResponses.Unauthorized)
   findAllWaitingOrders(
-    @Query() filterDto: FilterWaitingOrderDto
+    @Query() filterDto: FilterOrderDto
   ) {
     return this.orderService.findAllWaitingOrders(filterDto);
   }
@@ -65,8 +65,9 @@ export class OrderController {
   deliveryUserOrders(
     @Param('deliveryUserId') deliveryUserId: string,
     // @Body() updateOrderDto: UpdateOrderDto 
+    @Query() filterDto: FilterOrderDto
   ) {
-    return this.orderService.deliveryUserOrders(deliveryUserId);
+    return this.orderService.deliveryUserOrders(deliveryUserId, filterDto);
   }
   
   @Get('userOrders/:userId')

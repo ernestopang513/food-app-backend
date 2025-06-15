@@ -1,6 +1,6 @@
 import { DataSource, In } from "typeorm";
 import { CreateOrderDto } from "../dto/create-order.dto";
-import { BadRequestException, InternalServerErrorException, Logger } from "@nestjs/common";
+import { BadRequestException, InternalServerErrorException, Logger, Injectable } from '@nestjs/common';
 import { User } from "src/auth/entities/user.entity";
 import { haversineDistance, estimateBicycleTimeMinutes } from "src/common/utils/distance.util";
 import { DeliveryPoint } from "src/delivery-point/entities/delivery-point.entity";
@@ -12,7 +12,7 @@ import { Order } from "../entities/order.entity";
 
 
 
-
+@Injectable()
 export class OrderCreationService {
 
     private readonly logger = new Logger('OrderService')

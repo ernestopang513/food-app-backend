@@ -14,6 +14,8 @@ import { estimateBicycleTimeMinutes, haversineDistance } from 'src/common/utils/
 import { FilterOrderDto } from './dto/filter-orders.dto';
 import { AssignDeliveryDto } from './dto/assingn-delivery-status.dto';
 import { OrderCreationService } from './services/order-creation.service';
+import { OrdersSocketService } from 'src/ordersSocket/ordersSocket.service';
+import { OrdersSocketGateway } from '../ordersSocket/ordersSocket.gateway';
 
 @Injectable()
 export class OrderService {
@@ -31,6 +33,8 @@ export class OrderService {
     private readonly dataSource: DataSource,
     
     private readonly orderCreationService: OrderCreationService,
+
+    private readonly ordersGateway: OrdersSocketGateway,
 
   ) {}
 
@@ -143,7 +147,7 @@ export class OrderService {
 
     const order = await this.orderRepository.findOne({
       where: { id },
-      relations: ['deliveryUser' ]
+      relations: ['deliveryUser', 'deliveryPoint' ]
     });
     if (!order ) throw new NotFoundException('Order not found.');
 
@@ -170,6 +174,12 @@ export class OrderService {
     }
     
     order.status = assingDeliveryDto.status || OrderStatus.EN_CAMINO ;
+
+   this.ordersGateway.emitOrderUpdate({
+    deliveryPointId: order.deliveryPoint.id,
+    orderId: order.id
+   })
+
 
     return this.orderRepository.save(order);
 

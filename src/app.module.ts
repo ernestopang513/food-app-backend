@@ -8,6 +8,7 @@ import { DeliveryPointModule } from './delivery-point/delivery-point.module';
 import { SeedModule } from './seed/seed.module';
 import { AuthModule } from './auth/auth.module';
 import { OrderModule } from './order/order.module';
+import { OrdersSocketModule } from './ordersSocket/ordersSocket.module';
 
 
 @Module({
@@ -39,7 +40,9 @@ import { OrderModule } from './order/order.module';
 
     AuthModule,
 
-    OrderModule
+    OrderModule,
+
+    OrdersSocketModule
   ],
 })
 export class AppModule {}

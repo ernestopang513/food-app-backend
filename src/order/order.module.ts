@@ -7,12 +7,18 @@ import { OrderDish } from './entities/order-dish.entity';
 import { User } from 'src/auth/entities/user.entity';
 import { AuthModule } from 'src/auth/auth.module';
 import { OrderCreationService } from './services/order-creation.service';
+import { OrdersSocketService } from 'src/ordersSocket/ordersSocket.service';
+import { OrdersSocketModule } from 'src/ordersSocket/ordersSocket.module';
+import { OrdersSocketGateway } from 'src/ordersSocket/ordersSocket.gateway';
 
 @Module({
   controllers: [OrderController],
   providers: [
     OrderService, 
-    OrderCreationService
+    OrderCreationService,
+    //
+    // OrdersSocketGateway
+    //
   ],
   imports: [
     TypeOrmModule.forFeature([
@@ -20,7 +26,10 @@ import { OrderCreationService } from './services/order-creation.service';
       OrderDish,
       User,
     ]),
-    AuthModule
-  ]
+    AuthModule,
+    //
+    OrdersSocketModule
+    //
+  ],
 })
 export class OrderModule {}

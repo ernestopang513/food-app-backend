@@ -43,6 +43,14 @@ export class OrdersSocketService {
 
     }
 
+    getConnectedClients() {
+        return this.connectedClients
+    }
+
+    getSocketById(id: string): Socket {
+        return this.connectedClients[id].socket;
+    }
+
     removeClient(clientId: string) {
         delete this.connectedClients[clientId]
     }
@@ -52,12 +60,6 @@ export class OrdersSocketService {
     // this.gateway.emitOrderAssigned(order);
 //   }
 
-//////////////
- emitOrderChangeToAll(order: { deliveryPointId: string; orderId: string }) {
-    console.log('Emitting order-assigned', order);
-    Object.values(this.connectedClients).forEach(({ socket }) => {
-      socket.emit('order-assigned', order);
-    });
-  }
+
     //////////////////////
 }

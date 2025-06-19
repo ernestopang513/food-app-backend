@@ -21,6 +21,8 @@ export class OrdersSocketGateway implements OnGatewayConnection, OnGatewayDiscon
     const token = client.handshake.headers.authentication as string;
     let payload: JwtPayload;
     try {
+      // console.log(token)
+      // console.log(client)
       payload = this.jwtService.verify(token);
       await this.ordersSocketService.registerClient(client, payload.id);
     } catch (error) {
@@ -29,6 +31,8 @@ export class OrdersSocketGateway implements OnGatewayConnection, OnGatewayDiscon
     }
 
     // console.log({payload})
+    // const clients = this.ordersSocketService.getConnectedClients();
+    // console.log(clients)
 
   }
   
@@ -38,8 +42,19 @@ export class OrdersSocketGateway implements OnGatewayConnection, OnGatewayDiscon
   }
 
 
-  emitOrderUpdate(data: { deliveryPointId: string; orderId: string }) {
-    this.server.emit('order-assigned', data);
+  emitOrderUpdate(data: { deliveryPointId: string; orderId: string, foodStandId: string }) {
+
+    const clients = this.ordersSocketService.getConnectedClients()
+
+    for(const client of Object.values(clients)) {
+      client.socket.emit('order-assigned', data)
+    }
+
+    // for (const clientId of clients) {
+
+    // }
+
+    // this.server.emit('order-assigned', data);
   }
 
 

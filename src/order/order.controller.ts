@@ -108,7 +108,7 @@ export class OrderController {
   }
  
   @Patch(':id/cancel')
-  @ApiResponse({status: 200, description: 'Cancela correctamente la'})
+  @ApiResponse({status: 200, description: 'Cancela correctamente la orden'})
   @ApiResponse(ApiResponses.BadRequest)
   @ApiResponse(ApiResponses.Unauthorized)
   @ApiResponse(ApiResponses.NotFound)
@@ -124,12 +124,21 @@ export class OrderController {
     return this.orderService.cancelOrder(id, updateOrderDto);
     
   }
+  @Patch(':id/cancelByDeliveryUser')
+  @Auth(ValidRoles.ADMIN, ValidRoles.EMPLOYEE)
+  @ApiResponse({status: 200, description: 'Cancela correctamente la orden'})
+  @ApiResponse(ApiResponses.BadRequest)
+  @ApiResponse(ApiResponses.Unauthorized)
+  @ApiResponse(ApiResponses.NotFound)
+  @ApiResponse(ApiResponses.ServerError)
+  cancelOrderDeliveryUser(
+    @Param('id') id: string, 
+    ) {
+    
+    return this.orderService.cancelOrderDeliveryUser(id);
+    
+  }
   
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() createOrderDto: CreateOrderDto) {
-  //   return this.orderService.update(id, createOrderDto);
-  // }
-
   @Delete(':id')
   @Auth(ValidRoles.ADMIN, ValidRoles.EMPLOYEE)
   @ApiResponse({status: 200, description: 'Eliminado exitosamente'})

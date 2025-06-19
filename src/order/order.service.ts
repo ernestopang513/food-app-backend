@@ -16,6 +16,7 @@ import { AssignDeliveryDto } from './dto/assingn-delivery-status.dto';
 import { OrderCreationService } from './services/order-creation.service';
 import { OrdersSocketService } from 'src/ordersSocket/ordersSocket.service';
 import { OrdersSocketGateway } from '../ordersSocket/ordersSocket.gateway';
+import { OrderCancelDeliveryUser } from './services/order-cancel-delivery-user.service';
 
 @Injectable()
 export class OrderService {
@@ -34,6 +35,8 @@ export class OrderService {
     
     private readonly orderCreationService: OrderCreationService,
 
+    private readonly cancelOrderDeliveryUserService: OrderCancelDeliveryUser,
+
     private readonly ordersGateway: OrdersSocketGateway,
 
   ) {}
@@ -42,7 +45,7 @@ export class OrderService {
 
   async create(createOrderDto: CreateOrderDto) {
 
-    return this.orderCreationService.create(createOrderDto)
+    return this.orderCreationService.create(createOrderDto);
 
   }
 
@@ -177,7 +180,8 @@ export class OrderService {
 
    this.ordersGateway.emitOrderUpdate({
     deliveryPointId: order.deliveryPoint.id,
-    orderId: order.id
+    orderId: order.id,
+    foodStandId: order.foodStandId,
    })
 
 
@@ -248,6 +252,10 @@ export class OrderService {
     });
   }
 
+  async cancelOrderDeliveryUser(id: string) {
+    return this.cancelOrderDeliveryUserService.cancelOrderDeliveryUser(id);
+  }
+
   async cancelOrder(id: string , updateOrderDto: UpdateOrderDto) {
 
     const queryRunner = this.dataSource.createQueryRunner();
@@ -264,7 +272,7 @@ export class OrderService {
       if (!order) {
         throw new NotFoundException(`Orden con id ${id} no encontrada.`);
       }
-
+      
       if ( order.user.id !== updateOrderDto.userId ) {
         throw new BadRequestException(`Acción no permitida`);
       }

@@ -8,6 +8,7 @@ import { FoodStandDish } from "src/food-stand-dish/entities/food-stand-dish.enti
 import { FoodStand } from "src/food-stands/entities/food-stand.entity";
 import { OrderDish } from "../entities/order-dish.entity";
 import { Order } from "../entities/order.entity";
+import { OrdersSocketGateway } from "src/ordersSocket/ordersSocket.gateway";
 
 
 
@@ -15,11 +16,13 @@ import { Order } from "../entities/order.entity";
 @Injectable()
 export class OrderCreationService {
 
-    private readonly logger = new Logger('OrderService')
+    private readonly logger = new Logger('CreateOrderService')
 
     constructor(
         
         private readonly dataSource: DataSource,
+
+        private readonly orderGateway: OrdersSocketGateway,
         
     ){}
 
@@ -136,7 +139,14 @@ export class OrderCreationService {
           }
     
           await queryRunner.commitTransaction();
-    
+          
+          this.orderGateway.emitOrderUpdate({
+            deliveryPointId: deliveryPoint.id,
+            orderId: order.id,
+            foodStandId: foodStand.id
+          })
+
+
           this.logger.log(`Orden ${order.id} creada correctamente`);
           return order;
     

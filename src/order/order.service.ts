@@ -146,7 +146,7 @@ export class OrderService {
     }
   }
 
-  async assignDeliveryUser(id: string, assingDeliveryDto: AssignDeliveryDto) {
+  async assignAndUpdateOrderStatus(id: string, assingDeliveryDto: AssignDeliveryDto) {
 
     const order = await this.orderRepository.findOne({
       where: { id },

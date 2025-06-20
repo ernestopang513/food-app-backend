@@ -92,7 +92,7 @@ export class OrderController {
     return this.orderService.findOne(id);
   }
 
-  @Patch(':id/assign-delivery')
+  @Patch(':id/delivery-status')
   @Auth(ValidRoles.EMPLOYEE, ValidRoles.ADMIN)
   @ApiResponse({status: 200, description: 'Actualizado correctamente'})
   @ApiResponse(ApiResponses.BadRequest)
@@ -103,7 +103,7 @@ export class OrderController {
     @Param('id') id: string, 
     @Body() assingDeliveryDto: AssignDeliveryDto) {
 
-    return this.orderService.assignDeliveryUser(id, assingDeliveryDto);
+    return this.orderService.assignAndUpdateOrderStatus(id, assingDeliveryDto);
     
   }
  

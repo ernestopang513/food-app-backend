@@ -45,33 +45,17 @@ export class OrdersSocketGateway implements OnGatewayConnection, OnGatewayDiscon
   emitOrderUpdate(data: { deliveryPointId: string; orderId: string, foodStandId: string }) {
 
     const clients = this.ordersSocketService.getConnectedClients()
-
     for(const client of Object.values(clients)) {
       client.socket.emit('order-assigned', data)
     }
-
-    // for (const clientId of clients) {
-
-    // }
-
-    // this.server.emit('order-assigned', data);
   }
+  emitOrderUpdateDevliveryUser(data: { deliveryPointId: string; orderId: string, foodStandId: string, deliveryUserId: string }) {
 
-
-  // emitToAll(event: string, payload:any) {
-  //       Object.values(this.connectedClients).forEach(({socket}) => {
-  //           socket.emit(event,payload);
-  //       })
-    // // }
-    // emitOrderAssigned(order: {deliveryPointId: string, orderId:string}) {
-    //     console.log('Emitting order-assigned', order);
-    //     this.server.emit('order-assigned', order)
-    // }
-    // // emitOrderChangeToAll(order: {deliveryPointId: string, orderId:string}) {
-    //     Object.values(this.connectedClients).forEach(({socket}) => {
-    //         socket.emit('order-assigned', order);
-    //     })
-    // }
-
-
+    const clients = this.ordersSocketService.getConnectedClients()
+    for(const client of Object.values(clients)) {
+      if(client.user.id === data.deliveryUserId){
+        client.socket.emit('deliveryUser-order-update', data)
+      }
+    }
+  }
 }

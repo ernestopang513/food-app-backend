@@ -44,11 +44,24 @@ export class FoodStandsService {
 
   }
 
+  // findAll() {
+  //   return this.foodStandRepository.find({
+  //     relations: ['foodStandDishes', 'foodStandDishes.dish'],
+  //     order: {
+  //       name: 'ASC'
+  //     }
+  //   })
+  // }
+
   findAll() {
-    return this.foodStandRepository.find({
-      relations: ['foodStandDishes', 'foodStandDishes.dish']
-    })
-  }
+  return this.foodStandRepository
+    .createQueryBuilder('foodStand')
+    .leftJoinAndSelect('foodStand.foodStandDishes', 'foodStandDish')
+    .leftJoinAndSelect('foodStandDish.dish', 'dish')
+    .orderBy('foodStand.createdAt', 'ASC')         // ordena los food stands
+    .addOrderBy('dish.name', 'ASC')           // ordena los dishes dentro de cada foodStandDish
+    .getMany();
+}
 
   async findOne(id: string) {
   
@@ -56,7 +69,14 @@ export class FoodStandsService {
     try {
       const foodStand = await this.foodStandRepository.findOne({ 
         where: {id},
-        relations: ['foodStandDishes', 'foodStandDishes.dish']
+        relations: ['foodStandDishes', 'foodStandDishes.dish'],
+        order: {
+          foodStandDishes: {
+            dish: {
+              name: 'ASC'
+            }
+          }
+        }
       }) ;
       if ( !foodStand )
         throw new NotFoundException(`Food Stand with id ${id} not found.`);

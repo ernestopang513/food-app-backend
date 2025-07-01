@@ -123,13 +123,10 @@ export class Order {
     @ManyToOne(
         () => User,
         (user) => user.ordersDelivered,
-        {onDelete: 'CASCADE'}         
+        {
+            onDelete: 'CASCADE',
+            nullable: true
+        }         
     )
-    // @JoinColumn({name: 'deliveryUserId'}) 
-    deliveryUser: User ;
-    
-    // @Column({
-    //     nullable: true
-    // })
-    // deliveryUserId: string;
+    deliveryUser: User | null ;
 }

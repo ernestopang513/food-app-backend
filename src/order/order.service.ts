@@ -178,11 +178,36 @@ export class OrderService {
     
     order.status = assingDeliveryDto.status || OrderStatus.EN_CAMINO ;
 
-   this.ordersGateway.emitOrderUpdate({
-    deliveryPointId: order.deliveryPoint.id,
-    orderId: order.id,
-    foodStandId: order.foodStandId,
-   })
+
+    if (order.status !== OrderStatus.EN_CAMINO ) {
+      if(assingDeliveryDto.status === OrderStatus.PENDIENTE){
+        order.deliveryUser = null;
+        this.ordersGateway.emitOrderUpdateDevliveryUser({
+          deliveryPointId: order.deliveryPoint.id,
+          orderId: order.id,
+          foodStandId: order.foodStandId,
+          deliveryUserId: deliveryUser.id
+        })
+        this.ordersGateway.emitOrderUpdate({
+          deliveryPointId: order.deliveryPoint.id,
+          orderId: order.id,
+          foodStandId: order.foodStandId,
+        })
+      }else {
+        this.ordersGateway.emitOrderUpdateDevliveryUser({
+          deliveryPointId: order.deliveryPoint.id,
+          orderId: order.id,
+          foodStandId: order.foodStandId,
+          deliveryUserId: order.deliveryUser.id
+        })
+      }
+    }else { 
+      this.ordersGateway.emitOrderUpdate({
+        deliveryPointId: order.deliveryPoint.id,
+        orderId: order.id,
+        foodStandId: order.foodStandId,
+      })
+    }
 
 
     return this.orderRepository.save(order);

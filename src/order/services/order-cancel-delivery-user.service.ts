@@ -1,8 +1,7 @@
-import { BadRequestException, Injectable, InternalServerErrorException, Logger, NotFoundException } from "@nestjs/common";
+import { Injectable, InternalServerErrorException, Logger, NotFoundException } from "@nestjs/common";
 import { FoodStandDish } from "src/food-stand-dish/entities/food-stand-dish.entity";
 import { OrdersSocketGateway } from "src/ordersSocket/ordersSocket.gateway";
 import { DataSource } from "typeorm";
-import { UpdateOrderDto } from "../dto/update-order.dto";
 import { Order } from "../entities/order.entity";
 import { OrderStatus } from "../enums/order-status.enum";
 
@@ -50,7 +49,6 @@ export class OrderCancelDeliveryUser {
               await queryRunner.manager.save(fsDish);
             }
           }
-            console.log('hola')
             order.status = OrderStatus.CANCELADO;
             await queryRunner.manager.save(order);
             

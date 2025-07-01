@@ -11,6 +11,7 @@ import { LoginUserDto } from './dto';
 import { JwtService } from '@nestjs/jwt';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
 import { UserRole } from './enums/user-role.enum';
+import { ValidRoles } from './interfaces';
 
 @Injectable()
 export class AuthService {
@@ -129,10 +130,17 @@ export class AuthService {
     return token;
   }
 
-  // findAll() {
-  //   return `This action returns all auth`;
-  // }
-
+  findAllAdmins() {
+    return this.userRepository.find({
+      where: {role: UserRole.ADMIN}
+    })
+  }
+  
+  findAllEmployees() {
+    return this.userRepository.find({
+      where: {role: UserRole.EMPLOYEE}
+    })
+  }
   // findOne(id: number) {
   //   return `This action returns a #${id} auth`;
   // }
@@ -141,9 +149,20 @@ export class AuthService {
   //   return `This action updates a #${id} auth`;
   // }
 
-  // remove(id: number) {
-  //   return `This action removes a #${id} auth`;
-  // }
+  async removeSuperUser(id: string) {
+    try {
+      const superUser = await this.userRepository.findOne({
+        where: {id}
+      })
+      if (!superUser) {
+        throw new Error('No se encontraron datos')
+      }
+
+      await this.userRepository.remove(superUser);
+    } catch (error) {
+      this.handleDBErrors(error)
+    }
+  }
 
   validateAdminKey(key: string): boolean {
     return key === process.env.ADMIN_SECRET_KEY;

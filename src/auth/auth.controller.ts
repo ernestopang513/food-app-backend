@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, UnauthorizedException, HttpCode } from '@nestjs/common';
+import { Controller, Get, Post, Body, UnauthorizedException, HttpCode, Delete, Param } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto, LoginUserDto } from './dto';
 import { GetUser } from './decorators/get-user.decorator';
@@ -36,6 +36,7 @@ export class AuthController {
   }
   
   @Post('register-admin')
+  // @Auth(ValidRoles.ADMIN)
   @ApiResponse({ status: 201, description: 'User admin creado', type: User })
   @ApiResponse(ApiResponses.BadRequest)
   @ApiResponse(ApiResponses.ServerError)
@@ -69,12 +70,23 @@ export class AuthController {
     
   @Get('check-status')
   @Auth()
-  checkAuthStatuas(
+  checkAuthStatus(
     @GetUser() user: User
   ) {
     return this.authService.checkAuthStatus(user);
   }
 
+  @Get('admins')
+  @Auth(ValidRoles.ADMIN)
+  findAllAdmins() {
+    return this.authService.findAllAdmins();
+  }
+  
+  @Get('employees')
+  @Auth(ValidRoles.ADMIN)
+  findAllEmployees() {
+    return this.authService.findAllEmployees();
+  }
 
   @Get('private')
 
@@ -94,8 +106,9 @@ export class AuthController {
   //   return this.authService.update(+id, updateAuthDto);
   // }
 
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.authService.remove(+id);
-  // }
+  @Delete('super-user/:id')
+  @Auth(ValidRoles.ADMIN)
+  removeSuperUser(@Param('id') id: string) {
+    return this.authService.removeSuperUser(id);
+  }
 }

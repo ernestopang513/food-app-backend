@@ -44,7 +44,7 @@ export class CreateFoodStandDto {
     isOpen?: boolean;
 
    
-    @IsOptional()
-    @IsArray()
-    foodStandDishes?: FoodStandDish[];
+    // @IsOptional()
+    // @IsArray()
+    // foodStandDishes?: FoodStandDish[];
 }

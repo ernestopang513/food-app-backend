@@ -10,7 +10,7 @@ export class DishImage {
     id: string;
 
     @Column({
-        type: 'string',
+        type: 'text',
         nullable: false,
     })
     url_image: string;
@@ -18,7 +18,7 @@ export class DishImage {
     @ManyToOne(
         () => Dish,
         (dish) => dish.images,
-        {onDelete: 'CASCADE', eager: true}
+        {onDelete: 'CASCADE', nullable: false}
     )
     dish: Dish;
 }

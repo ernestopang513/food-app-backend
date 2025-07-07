@@ -66,7 +66,7 @@ export class Dish {
     @OneToMany(
         () => DishImage,
         (dishImage) => dishImage.dish,
-        {cascade: true}
+        {cascade: true, eager: true}
     )
     images: DishImage[];
 

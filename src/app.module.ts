@@ -9,6 +9,7 @@ import { SeedModule } from './seed/seed.module';
 import { AuthModule } from './auth/auth.module';
 import { OrderModule } from './order/order.module';
 import { OrdersSocketModule } from './ordersSocket/ordersSocket.module';
+import { DishImageModule } from './dish-image/dish-image.module';
 
 
 @Module({
@@ -42,7 +43,9 @@ import { OrdersSocketModule } from './ordersSocket/ordersSocket.module';
 
     OrderModule,
 
-    OrdersSocketModule
+    OrdersSocketModule,
+
+    DishImageModule
   ],
 })
 export class AppModule {}

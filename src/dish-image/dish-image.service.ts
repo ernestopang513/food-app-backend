@@ -35,10 +35,11 @@ export class DishImageService {
   
       const dishImage = this.dishImageRepository.create({
         ...createDishImageDto,
-        dish
       });
   
-      return this.dishImageRepository.save(dishImage);
+      dish.image = dishImage;
+
+      return this.dishRepository.save(dish);
       
     } catch (error) {
       // this.logger.error('Error relacion imagen platillo', error.stack)

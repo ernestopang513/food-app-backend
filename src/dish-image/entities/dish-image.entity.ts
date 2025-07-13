@@ -1,5 +1,5 @@
 import { Dish } from "src/dish/entities/dish.entity";
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 
 
 
@@ -15,10 +15,9 @@ export class DishImage {
     })
     url_image: string;
 
-    @ManyToOne(
+    @OneToOne(
         () => Dish,
-        (dish) => dish.images,
-        {onDelete: 'CASCADE', nullable: false}
+        (dish) => dish.image,
     )
     dish: Dish;
 }

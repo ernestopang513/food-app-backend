@@ -9,7 +9,7 @@ import { DeliveryPoint } from './entities/delivery-point.entity';
 import { ApiResponses } from 'src/common/swagger/api-responses';
 
 @Controller('delivery-point')
-@Auth()
+// @Auth()
 export class DeliveryPointController {
   constructor(private readonly deliveryPointService: DeliveryPointService) {}
 

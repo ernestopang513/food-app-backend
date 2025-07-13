@@ -2,7 +2,7 @@ import { ApiProperty } from "@nestjs/swagger";
 import { DishImage } from "src/dish-image/entities/dish-image.entity";
 import { FoodStandDish } from "src/food-stand-dish/entities/food-stand-dish.entity";
 import { OrderDish } from "src/order/entities/order-dish.entity";
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 
 
 
@@ -63,12 +63,13 @@ export class Dish {
     )
     orderDishes: OrderDish[];
     
-    @OneToMany(
+    @OneToOne(
         () => DishImage,
         (dishImage) => dishImage.dish,
-        {cascade: true, eager: true}
+        {cascade: true, eager: true, nullable: true}
     )
-    images: DishImage[];
+    @JoinColumn()
+    image?: DishImage;
 
 
 }

@@ -106,7 +106,14 @@ export const InitialData: SeedData = {
             "email": "ernestopang513@gmail.com",
             "fullName": "Ernesto Pang Araizaga"
 
-        }
+        },
+        {
+            "userName": "ErnestoPangEng",
+            "password": "Abc123",
+            "email": "ernestopang513@hotmail.com",
+            "fullName": "Ernesto Pang Araizaga"
+
+        },
     ],
     deliveryPoints: [
         {

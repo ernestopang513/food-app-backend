@@ -9,7 +9,7 @@ export class SeedController {
  
 
   @Get()
-  @Auth()
+  // @Auth()
   findAll() {
     return this.seedService.runSeed();
     

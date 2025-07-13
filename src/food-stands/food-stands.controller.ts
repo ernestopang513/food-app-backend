@@ -9,7 +9,7 @@ import { FoodStand } from './entities/food-stand.entity';
 import { ApiResponses } from 'src/common/swagger/api-responses';
 
 @Controller('food-stands')
-@Auth()
+// @Auth()
 export class FoodStandsController {
   constructor(private readonly foodStandsService: FoodStandsService) {}
 

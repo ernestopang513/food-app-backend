@@ -9,7 +9,6 @@ import { ApiResponses } from 'src/common/swagger/api-responses';
 import { Dish } from './entities/dish.entity';
 
 @Controller('dish')
-@Auth()
 export class DishController {
   constructor(private readonly dishService: DishService) {}
 
